@@ -1,0 +1,31 @@
+a
+()
+'(a b c)
+'hello
+'()
+'((a b) c d)
+
+(car '(a b c))
+(car '((a b) c d))
+(car (cdr '(a b c)))
+
+(cdr '(a b c))
+(cdr '((a b) c d))
+(cdr '(a))
+
+(cons 'a '(b c))
+(cons 'a 'b)
+(cons 'x '())
+(cons '(a b) '(c d))
+(cons '(a b) 'c)
+(cons '() '())
+
+(eval (car '(a b c)))
+(eval (cdr '(a b c)))
+(eval '(car '(x y z)))
+(eval '(cdr '(x y z)))
+
+(car (cons 'hello '(world)))
+(cdr (cons 'a 'b))
+(cons (car '(a b c)) '(x y))
+(cons (cdr '(a b c)) '(x y))

@@ -1,0 +1,26 @@
+a
+()
+(a b c)
+hello
+()
+((a b) c d)
+a
+(a b)
+b
+(b c)
+(c d)
+()
+(a b c)
+(a . b)
+(x)
+((a b) c d)
+((a b) . c)
+(())
+a
+(b c)
+x
+(y z)
+hello
+b
+(a x y)
+((b c) x y)

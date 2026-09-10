@@ -1,0 +1,259 @@
+
+----------------------------------------------------------
+---------------------- TEST IS ATOM -----------------------
+-----------------------------------------------------------
+📌 Note: isAtom should return true only when the S-expression is an atom.
+
+✅ PASS ✅	 Identifies an atom as an atom. | isAtom(a) -> true
+
+✅ PASS ✅	 Does not identify NIL as an atom. | isAtom(NIL) -> false
+
+✅ PASS ✅	 Does not identify a cell as an atom. | isAtom(cell) -> false
+
+----------------------------------------------------------
+---------------------- TEST IS NIL ------------------------
+-----------------------------------------------------------
+📌 Note: isNil should return true only when the S-expression is NIL.
+
+✅ PASS ✅	Identifies NIL as NIL. | isNil(nil) -> true
+
+✅ PASS ✅	Does not identify an atom as NIL. | isNil(atom) -> false
+
+✅ PASS ✅	Does not identify a cell as NIL. | isNil(cell) -> false
+
+-----------------------------------------------------------
+--------------------- TEST MAKE ATOM ----------------------
+-----------------------------------------------------------
+
+✅ PASS ✅	Creates an atom with the correct type and value. | makeAtom("string") -> ATOM "string"
+
+-----------------------------------------------------------
+--------------------- TEST MAKE NIL -----------------------
+-----------------------------------------------------------
+
+✅ PASS ✅	Creates an S-expression with type NIL. | makeNil() -> NIL
+
+-----------------------------------------------------------
+------------------ TEST SKIP WHITESPACE -------------------
+-----------------------------------------------------------
+📌 Note: Next character should never be whitespace.
+
+✅ PASS ✅	Skips multiple spaces | Next character is 'a'.
+
+✅ PASS ✅	No spaces. | Next character is 'n'.
+
+✅ PASS ✅	Skips newline. | Next character is 'n'.
+
+✅ PASS ✅	Skips tab. | Next character is 't'.
+
+✅ PASS ✅	Skips mixed whitespace. | Next character is 'r'.
+
+-----------------------------------------------------------
+------------------------ TEST CAR -------------------------
+-----------------------------------------------------------
+📌 Note: Car should return the first element of an S-expression.
+
+✅ PASS ✅	Returns an atom stored in the car of a list. | (car (a b c)) -> a
+
+✅ PASS ✅	Returns a nested list stored in the car of a list. | (car ((a b) c d)) -> (a b)
+
+✅ PASS ✅	Returns the car of a dotted pair. | (car (a . b)) -> a
+
+-----------------------------------------------------------
+------------------------- TEST CDR ------------------------
+-----------------------------------------------------------
+📌 Note: Cdr should return everything except the first element of an S-expression.
+
+✅ PASS ✅	Returns the cdr of a list. | (cdr (a b c)) -> (b c)
+
+✅ PASS ✅	Returns the cdr when the first element is a nested list. | (cdr ((a b) c d)) -> (c d)
+
+✅ PASS ✅	Returns the cdr of a dotted pair. | (cdr (a . b)) -> b
+
+-----------------------------------------------------------
+------------------------ TEST CONS ------------------------
+-----------------------------------------------------------
+📌 Note: Cons should create a new cell using the first argument as the car and the second argument as the cdr.
+
+
+🔎 Test: Both arguments are atoms. | cons(a, b)
+✅ PASS ✅	Creates a new cell. | cons(a, b) should have type -> CELL
+✅ PASS ✅	Stores the first argument as the car. | cons(a, b) should have car -> a
+✅ PASS ✅	Stores the second argument as the cdr. | cons(a, b) should have cdr -> b
+
+
+🔎 Test: The first argument is an atom and the second is a list. | cons(a, (b c))
+✅ PASS ✅	Creates a new cell. | cons(a, (b c)) should have type -> CELL
+✅ PASS ✅	Stores the first argument as the car. | cons(a, (b c)) should have car -> a
+✅ PASS ✅	Stores the second argument as the cdr. | cons(a, (b c)) should have cdr -> (b c)
+
+
+🔎 Test: The first argument is a list and the second is an atom. | cons((a b), c)
+✅ PASS ✅	Creates a new cell. | cons((a b), c) should have type -> CELL
+✅ PASS ✅	Stores the first argument as the car. | cons((a b), c) should have car -> (a b)
+✅ PASS ✅	Stores the second argument as the cdr. | cons((a b), c) should have cdr -> c
+
+
+🔎 Test: Both arguments are lists. | cons((a b), (b c))
+✅ PASS ✅	Creates a new cell. | cons((a b), (b c)) should have type -> CELL
+✅ PASS ✅	Stores the first argument as the car. | cons((a b), (b c)) should have car -> (a b)
+✅ PASS ✅	Stores the second argument as the cdr. | cons((a b), (b c)) should have cdr -> (b c)
+
+
+🔎 Test: The second argument is NIL. | cons(a, ())
+✅ PASS ✅	Creates a new cell. | cons(a, ()) should have type -> CELL
+✅ PASS ✅	Stores the first argument as the car. | cons(a, ()) should have car -> a
+✅ PASS ✅	Stores the second argument as the cdr. | cons(a, ()) should have cdr -> ()
+
+-----------------------------------------------------------
+------------------------ TEST QUOTE -----------------------
+-----------------------------------------------------------
+📌 Note: Quote should return its argument without evaluating it.
+
+✅ PASS ✅	Returns an atom without evaluating it. | quote(a) -> a
+
+✅ PASS ✅	Returns a list without evaluating it. | quote((a b)) -> (a b)
+
+✅ PASS ✅	Returns NIL without evaluating it. | quote(()) -> ()
+
+-----------------------------------------------------------
+------------------------- TEST EVAL -----------------------
+-----------------------------------------------------------
+📌 Note: Eval should evaluate atoms, NIL, and expressions containing the supported operations car, cdr, cons, quote, and eval.
+
+✅ PASS ✅	Returns an atom unchanged. | eval(a) -> a
+
+✅ PASS ✅	Returns NIL unchanged. | eval(()) -> ()
+
+✅ PASS ✅	Evaluates a simple car expression. | eval((car (a b c))) -> a
+
+✅ PASS ✅	Evaluates a simple cdr expression. | eval((cdr (a b c))) -> (b c)
+
+✅ PASS ✅	Evaluates a simple cons expression. | eval((cons a b)) -> (a . b)
+
+✅ PASS ✅	Evaluates a simple quote expression. | eval((quote a)) -> a
+
+✅ PASS ✅	Evaluates a simple eval expression. | eval((eval a)) -> a
+
+✅ PASS ✅	Evaluates car with a quoted list. | eval((car (quote (a b c)))) -> a
+
+✅ PASS ✅	Evaluates cdr with a quoted list. | eval((cdr (quote (a b c)))) -> (b c)
+
+✅ PASS ✅	Evaluates cons with quoted arguments. | eval((cons (quote a) (quote (b c)))) -> (a b c)
+
+✅ PASS ✅	Evaluates the result of another expression. | eval((eval (car (a b c)))) -> a
+
+-----------------------------------------------------------
+---------------------- TEST READ ATOM ---------------------
+-----------------------------------------------------------
+📌 Note: readAtom should read characters and create an atom with the correct value.
+
+
+🔎 Test: Reads letters as an atom.
+✅ PASS ✅	Creates the correct type. | readAtom should have type -> ATOM
+✅ PASS ✅	Stores the correct value. | readAtom should have value -> "abc"
+
+
+🔎 Test: Reads a function name as an atom.
+✅ PASS ✅	Creates the correct type. | readAtom should have type -> ATOM
+✅ PASS ✅	Stores the correct value. | readAtom should have value -> "car"
+
+
+🔎 Test: Reads numbers as an atom.
+✅ PASS ✅	Creates the correct type. | readAtom should have type -> ATOM
+✅ PASS ✅	Stores the correct value. | readAtom should have value -> "123"
+
+
+🔎 Test: Reads symbols as an atom.
+✅ PASS ✅	Creates the correct type. | readAtom should have type -> ATOM
+✅ PASS ✅	Stores the correct value. | readAtom should have value -> "+-="
+
+
+🔎 Test: Reads an atom followed by a closing parenthesis.
+✅ PASS ✅	Creates the correct type. | readAtom should have type -> ATOM
+✅ PASS ✅	Stores the correct value. | readAtom should have value -> "par"
+
+
+🔎 Test: Reads an atom followed by whitespace.
+✅ PASS ✅	Creates the correct type. | readAtom should have type -> ATOM
+✅ PASS ✅	Stores the correct value. | readAtom should have value -> "space"
+
+-----------------------------------------------------------
+---------------------- TEST READ LIST ---------------------
+-----------------------------------------------------------
+📌 Note: readList should read the contents of a list and build the correct S-expression.
+
+
+🔎 Test: Reads an empty list.
+✅ PASS ✅	Creates the correct type. | readList should have type -> NIL
+
+🔎 Test: Reads a list containing one atom.
+✅ PASS ✅	Creates the correct type. | readList should have type -> CELL
+✅ PASS ✅	Stores the correct contents. | readList should contain -> (a)
+✅ PASS ✅	Ends the list correctly. | readList should end with -> NIL
+
+
+🔎 Test: Reads a list containing multiple atoms.
+✅ PASS ✅	Creates the correct type. | readList should have type -> CELL
+✅ PASS ✅	Stores the correct contents. | readList should contain -> (a b c)
+✅ PASS ✅	Ends the list correctly. | readList should end with -> NIL
+
+
+🔎 Test: Reads a list containing a nested list.
+✅ PASS ✅	Creates the correct type. | readList should have type -> CELL
+✅ PASS ✅	Stores the correct contents. | readList should contain -> ((a b) c)
+✅ PASS ✅	Ends the list correctly. | readList should end with -> NIL
+
+-----------------------------------------------------------
+---------------------- TEST READ EXPR ---------------------
+-----------------------------------------------------------
+📌 Note: readExpr should read an S-expression and determine how it should be interpreted.
+
+
+🔎 Test: Reads an atom.
+✅ PASS ✅	Creates the correct type. | readExpr should have type -> ATOM
+✅ PASS ✅	Stores the correct contents. | readExpr should contain -> abc
+
+
+🔎 Test: Reads a list.
+✅ PASS ✅	Creates the correct type. | readExpr should have type -> CELL
+✅ PASS ✅	Stores the correct contents. | readExpr should contain -> (a b c)
+
+
+🔎 Test: Reads quote shorthand for an atom.
+✅ PASS ✅	Creates the correct type. | readExpr should have type -> CELL
+✅ PASS ✅	Stores the correct contents. | readExpr should contain -> (quote a)
+
+
+🔎 Test: Reads quote shorthand for a list.
+✅ PASS ✅	Creates the correct type. | readExpr should have type -> CELL
+✅ PASS ✅	Stores the correct contents. | readExpr should contain -> (quote (a b c))
+
+
+🔎 Test: Reads an empty list.
+✅ PASS ✅	Creates the correct type. | readExpr should have type -> NIL
+✅ PASS ✅	Stores the correct contents. | readExpr should contain -> NIL
+
+-----------------------------------------------------------
+---------------------- TEST PRINT EXPR --------------------
+-----------------------------------------------------------
+📌 Note: printExpr should print an S-expression in the correct format.
+
+✅ PASS ✅	Prints an atom. | printed -> a, expected a
+
+✅ PASS ✅	Prints NIL. | printed -> (), expected ()
+
+✅ PASS ✅	Prints a list. | printed -> (a b c), expected (a b c)
+
+✅ PASS ✅	Prints a nested list. | printed -> ((a b) c), expected ((a b) c)
+
+✅ PASS ✅	Prints a dotted pair. | printed -> (a . b), expected (a . b)
+
+-----------------------------------------------------------
+---------------------- TEST PRINT LIST --------------------
+-----------------------------------------------------------
+📌 Note: printList should print the contents of a list in the correct format without the parentheses.
+
+✅ PASS ✅	Prints the contents of a proper list. | printed -> a b c, expected a b c
+
+✅ PASS ✅	Prints the contents of a dotted pair. | printed -> a . b, expected a . b

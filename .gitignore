@@ -1,0 +1,7 @@
+# Compiled executables
+sexpr
+test_sexpr
+unit_tests
+
+# macOS files
+.DS_Store
