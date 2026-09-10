@@ -1,26 +1,4 @@
 
-----------------------------------------------------------
----------------------- TEST IS ATOM -----------------------
------------------------------------------------------------
-📌 Note: isAtom should return true only when the S-expression is an atom.
-
-✅ PASS ✅	 Identifies an atom as an atom. | isAtom(a) -> true
-
-✅ PASS ✅	 Does not identify NIL as an atom. | isAtom(NIL) -> false
-
-✅ PASS ✅	 Does not identify a cell as an atom. | isAtom(cell) -> false
-
-----------------------------------------------------------
----------------------- TEST IS NIL ------------------------
------------------------------------------------------------
-📌 Note: isNil should return true only when the S-expression is NIL.
-
-✅ PASS ✅	Identifies NIL as NIL. | isNil(nil) -> true
-
-✅ PASS ✅	Does not identify an atom as NIL. | isNil(atom) -> false
-
-✅ PASS ✅	Does not identify a cell as NIL. | isNil(cell) -> false
-
 -----------------------------------------------------------
 --------------------- TEST MAKE ATOM ----------------------
 -----------------------------------------------------------
@@ -32,6 +10,28 @@
 -----------------------------------------------------------
 
 ✅ PASS ✅	Creates an S-expression with type NIL. | makeNil() -> NIL
+
+-----------------------------------------------------------
+---------------------- TEST IS ATOM -----------------------
+-----------------------------------------------------------
+📌 Note: isAtom should return true only when the S-expression is an atom.
+
+✅ PASS ✅	 Identifies an atom as an atom. | isAtom(a) -> true
+
+✅ PASS ✅	 Does not identify NIL as an atom. | isAtom(NIL) -> false
+
+✅ PASS ✅	 Does not identify a cell as an atom. | isAtom(cell) -> false
+
+-----------------------------------------------------------
+---------------------- TEST IS NIL ------------------------
+-----------------------------------------------------------
+📌 Note: isNil should return true only when the S-expression is NIL.
+
+✅ PASS ✅	Identifies NIL as NIL. | isNil(nil) -> true
+
+✅ PASS ✅	Does not identify an atom as NIL. | isNil(atom) -> false
+
+✅ PASS ✅	Does not identify a cell as NIL. | isNil(cell) -> false
 
 -----------------------------------------------------------
 ------------------ TEST SKIP WHITESPACE -------------------

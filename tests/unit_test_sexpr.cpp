@@ -38,7 +38,7 @@ void testMakeNil(){
 }
 
 void testIsAtom(){
-    cout << "\n----------------------------------------------------------" << endl;
+    cout << "\n-----------------------------------------------------------" << endl;
     cout << "---------------------- TEST IS ATOM -----------------------" << endl;
     cout << "-----------------------------------------------------------" << endl;
     cout << "📌 Note: isAtom should return true only when the S-expression is an atom." << endl;
@@ -70,7 +70,7 @@ void testIsAtom(){
 }
 
 void testIsNil(){
-    cout << "\n----------------------------------------------------------" << endl;
+    cout << "\n-----------------------------------------------------------" << endl;
     cout << "---------------------- TEST IS NIL ------------------------" << endl;
     cout << "-----------------------------------------------------------" << endl;
     cout << "📌 Note: isNil should return true only when the S-expression is NIL." << endl;
@@ -688,15 +688,11 @@ void testPrintList(){
 }
 
 
-
-
-
-
 int main() {
-    testIsAtom();
-    testIsNil();
     testMakeAtom();
     testMakeNil();
+    testIsAtom();
+    testIsNil();
     testSkipWhitespace();
     testCar();
     testCdr();

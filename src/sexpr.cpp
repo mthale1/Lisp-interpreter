@@ -6,9 +6,8 @@
 
 using namespace std;
 
-
-void skipWhitespace(){
 // Ignore whitespace characters in the input.
+void skipWhitespace(){
 
     while (cin && isspace(cin.peek()))
     {
@@ -16,8 +15,8 @@ void skipWhitespace(){
     }
 }
 
-SExpr* makeAtom(string value){
 // Creates & returns a new atom S-expression.
+SExpr* makeAtom(string value){
 
     SExpr* expr = new SExpr;
 
@@ -29,8 +28,8 @@ SExpr* makeAtom(string value){
     return expr;
 }
 
-SExpr* makeNil(){
 // Creates & returns a new NIL S-expression.
+SExpr* makeNil(){
 
     SExpr* expr = new SExpr;
 
@@ -41,24 +40,28 @@ SExpr* makeNil(){
     return expr;
 }
 
+// Returns true if the S-expression is an atom.
 bool isAtom(SExpr* expr){
     return expr->type == Type::ATOM;
 }
 
+// Returns true if the S-expression is NIL.
 bool isNil(SExpr* expr){
     return expr->type == Type::NIL;
 }
 
+// Returns the first element of a cell.
 SExpr* car(SExpr* expr){
     return expr->car;
 }
 
+// Returns the remainder of a cell.
 SExpr* cdr(SExpr* expr){
     return expr->cdr;
 }
 
+// Creates & returns a cell using first as the car and second as the cdr.
 SExpr* cons(SExpr* first, SExpr* second){
-// Creates & returns a new cell containing a car & cdr.
 
     SExpr* expr = new SExpr;
 
@@ -69,13 +72,14 @@ SExpr* cons(SExpr* first, SExpr* second){
     return expr;
 }
 
-SExpr* quote(SExpr* expr){
 // Simply return its argument to avoid evaluating an s-expression.
+SExpr* quote(SExpr* expr){
     return expr;
 }
 
+// Evaluates an S-expression by recognizing and executing
+// supported operations such as car, cdr, cons, quote, and eval.
 SExpr* eval(SExpr* expr){
-// Evaluates an S-expression and returns the result
 
     if (isAtom(expr)){
         return expr;
@@ -124,8 +128,8 @@ SExpr* eval(SExpr* expr){
     return expr;
 }
 
-SExpr* readAtom(){
 // Reads a symbol from input & returns it as an atom.
+SExpr* readAtom(){
 
     string symbol;
 
@@ -140,8 +144,8 @@ SExpr* readAtom(){
 SExpr* readExpr();
 SExpr* readList();
 
-SExpr* readList(){
 // Reads and constructs a list from the input.
+SExpr* readList(){
 
     skipWhitespace();
 
@@ -157,8 +161,8 @@ SExpr* readList(){
     return cons(first, rest);
 }
 
-SExpr* readExpr(){
 // Reads and returns the next S-expression from input.
+SExpr* readExpr(){
 
     skipWhitespace();
 
@@ -182,8 +186,8 @@ SExpr* readExpr(){
 
 void printList(SExpr* expr);
 
-void printExpr(SExpr* expr){
 // Prints an S-expression.
+void printExpr(SExpr* expr){
 
     if (expr->type == Type::ATOM){
         cout << expr->atom;
@@ -198,8 +202,8 @@ void printExpr(SExpr* expr){
     }
 }
 
+// Prints the contents of a list, including dotted notation.
 void printList(SExpr* expr){
-// Prints the contents of a list.
 
     if (expr->type == Type::NIL){
         return;
@@ -221,8 +225,8 @@ void printList(SExpr* expr){
 
 }
 
-void freeExpr(SExpr* expr){
 // Frees memory used by an S-expression.
+void freeExpr(SExpr* expr){
 
     if (expr == nullptr)
     {
@@ -238,8 +242,8 @@ void freeExpr(SExpr* expr){
     delete expr;
 }
 
-void mainLoop(){
 // Repeatedly reads and prints S-expressions until EOF (End-of-File).
+void mainLoop(){
 
     while (cin)
         {
