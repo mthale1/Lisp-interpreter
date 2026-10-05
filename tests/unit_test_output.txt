@@ -2,73 +2,105 @@
 -----------------------------------------------------------
 --------------------- TEST MAKE ATOM ----------------------
 -----------------------------------------------------------
+📌 Note: makeAtom should create an atom with the correct type and value.
 
-✅ PASS ✅	Creates an atom with the correct type and value. | makeAtom("string") -> ATOM "string"
+✅ PASS 	Creates an S-expression with the correct type. | Actual: ATOM | Expected: ATOM
+
+✅ PASS 	Stores the correct atom value. | Actual: string | Expected: string
+
+✅ PASS 	Stores numbers as atom text. | Actual: 123 | Expected: 123
+
+✅ PASS 	Stores symbols as atom text. | Actual: +-= | Expected: +-=
 
 -----------------------------------------------------------
 --------------------- TEST MAKE NIL -----------------------
 -----------------------------------------------------------
+📌 Note: makeNil should create an S-expression with type NIL.
 
-✅ PASS ✅	Creates an S-expression with type NIL. | makeNil() -> NIL
+✅ PASS 	Creates an S-expression with the correct type. | Actual: NIL | Expected: NIL
 
 -----------------------------------------------------------
 ---------------------- TEST IS ATOM -----------------------
 -----------------------------------------------------------
 📌 Note: isAtom should return true only when the S-expression is an atom.
 
-✅ PASS ✅	 Identifies an atom as an atom. | isAtom(a) -> true
+✅ PASS 	Identifies an atom as an atom. | Actual: true | Expected: true
 
-✅ PASS ✅	 Does not identify NIL as an atom. | isAtom(NIL) -> false
+✅ PASS 	Does not identify NIL as an atom. | Actual: false | Expected: false
 
-✅ PASS ✅	 Does not identify a cell as an atom. | isAtom(cell) -> false
+✅ PASS 	Does not identify a cell as an atom. | Actual: false | Expected: false
 
 -----------------------------------------------------------
 ---------------------- TEST IS NIL ------------------------
 -----------------------------------------------------------
 📌 Note: isNil should return true only when the S-expression is NIL.
 
-✅ PASS ✅	Identifies NIL as NIL. | isNil(nil) -> true
+✅ PASS 	Identifies NIL as NIL. | Actual: true | Expected: true
 
-✅ PASS ✅	Does not identify an atom as NIL. | isNil(atom) -> false
+✅ PASS 	Does not identify an atom as NIL. | Actual: false | Expected: false
 
-✅ PASS ✅	Does not identify a cell as NIL. | isNil(cell) -> false
+✅ PASS 	Does not identify a cell as NIL. | Actual: false | Expected: false
 
 -----------------------------------------------------------
------------------- TEST SKIP WHITESPACE -------------------
+--------------------- TEST IS NUMBER ----------------------
 -----------------------------------------------------------
-📌 Note: Next character should never be whitespace.
+📌 Note: isNumber should return true only when the S-expression is an atom representing a valid integer.
 
-✅ PASS ✅	Skips multiple spaces | Next character is 'a'.
+✅ PASS 	Identifies a positive integer. | Actual: true | Expected: true
 
-✅ PASS ✅	No spaces. | Next character is 'n'.
+✅ PASS 	Identifies a negative integer. | Actual: true | Expected: true
 
-✅ PASS ✅	Skips newline. | Next character is 'n'.
+✅ PASS 	Does not identify letters as an integer. | Actual: false | Expected: false
 
-✅ PASS ✅	Skips tab. | Next character is 't'.
+✅ PASS 	Does not identify mixed characters as an integer. | Actual: false | Expected: false
 
-✅ PASS ✅	Skips mixed whitespace. | Next character is 'r'.
+✅ PASS 	Does not identify a minus sign alone as an integer. | Actual: false | Expected: false
+
+✅ PASS 	Does not identify NIL as an integer. | Actual: false | Expected: false
+
+-----------------------------------------------------------
+------------------ TEST SYMBOL TO INT ---------------------
+-----------------------------------------------------------
+📌 Note: symbolToInt should convert an atom representing an integer into a C++ integer.
+
+✅ PASS 	Converts a positive numeric atom to an integer. | Actual: 123 | Expected: 123
+
+✅ PASS 	Converts a negative numeric atom to an integer. | Actual: -42 | Expected: -42
+
+✅ PASS 	Converts zero to an integer. | Actual: 0 | Expected: 0
+
+-----------------------------------------------------------
+------------------ TEST INT TO SYMBOL ---------------------
+-----------------------------------------------------------
+📌 Note: intToSymbol should convert a C++ integer into an atom S-expression.
+
+✅ PASS 	Converts a positive integer to a numeric atom. | Actual: 123 | Expected: 123
+
+✅ PASS 	Converts a negative integer to a numeric atom. | Actual: -42 | Expected: -42
+
+✅ PASS 	Converts zero to a numeric atom. | Actual: 0 | Expected: 0
 
 -----------------------------------------------------------
 ------------------------ TEST CAR -------------------------
 -----------------------------------------------------------
 📌 Note: Car should return the first element of an S-expression.
 
-✅ PASS ✅	Returns an atom stored in the car of a list. | (car (a b c)) -> a
+✅ PASS 	Returns an atom stored in the car of a list. | Actual: a | Expected: a
 
-✅ PASS ✅	Returns a nested list stored in the car of a list. | (car ((a b) c d)) -> (a b)
+✅ PASS 	Returns a nested list stored in the car of a list. | Actual: (a . b) | Expected: (a . b)
 
-✅ PASS ✅	Returns the car of a dotted pair. | (car (a . b)) -> a
+✅ PASS 	Returns the car of a dotted pair. | Actual: a | Expected: a
 
 -----------------------------------------------------------
 ------------------------- TEST CDR ------------------------
 -----------------------------------------------------------
 📌 Note: Cdr should return everything except the first element of an S-expression.
 
-✅ PASS ✅	Returns the cdr of a list. | (cdr (a b c)) -> (b c)
+✅ PASS 	Returns the rest of a list. | Actual: (b c) | Expected: (b c)
 
-✅ PASS ✅	Returns the cdr when the first element is a nested list. | (cdr ((a b) c d)) -> (c d)
+✅ PASS 	Returns the rest of a nested list. | Actual: (c d) | Expected: (c d)
 
-✅ PASS ✅	Returns the cdr of a dotted pair. | (cdr (a . b)) -> b
+✅ PASS 	Returns the cdr of a dotted pair. | Actual: b | Expected: b
 
 -----------------------------------------------------------
 ------------------------ TEST CONS ------------------------
@@ -77,71 +109,69 @@
 
 
 🔎 Test: Both arguments are atoms. | cons(a, b)
-✅ PASS ✅	Creates a new cell. | cons(a, b) should have type -> CELL
-✅ PASS ✅	Stores the first argument as the car. | cons(a, b) should have car -> a
-✅ PASS ✅	Stores the second argument as the cdr. | cons(a, b) should have cdr -> b
+✅ PASS 	Creates a new cell. | Actual: CELL | Expected: CELL
+
+✅ PASS 	Stores the first argument as the car. | Actual: a | Expected: a
+
+✅ PASS 	Stores the second argument as the cdr. | Actual: b | Expected: b
 
 
 🔎 Test: The first argument is an atom and the second is a list. | cons(a, (b c))
-✅ PASS ✅	Creates a new cell. | cons(a, (b c)) should have type -> CELL
-✅ PASS ✅	Stores the first argument as the car. | cons(a, (b c)) should have car -> a
-✅ PASS ✅	Stores the second argument as the cdr. | cons(a, (b c)) should have cdr -> (b c)
+✅ PASS 	Creates a new cell. | Actual: CELL | Expected: CELL
+
+✅ PASS 	Stores the first argument as the car. | Actual: a | Expected: a
+
+✅ PASS 	Stores the second argument as the cdr. | Actual: (b c) | Expected: (b c)
 
 
 🔎 Test: The first argument is a list and the second is an atom. | cons((a b), c)
-✅ PASS ✅	Creates a new cell. | cons((a b), c) should have type -> CELL
-✅ PASS ✅	Stores the first argument as the car. | cons((a b), c) should have car -> (a b)
-✅ PASS ✅	Stores the second argument as the cdr. | cons((a b), c) should have cdr -> c
+✅ PASS 	Creates a new cell. | Actual: CELL | Expected: CELL
+
+✅ PASS 	Stores the first argument as the car. | Actual: (a b) | Expected: (a b)
+
+✅ PASS 	Stores the second argument as the cdr. | Actual: c | Expected: c
 
 
 🔎 Test: Both arguments are lists. | cons((a b), (b c))
-✅ PASS ✅	Creates a new cell. | cons((a b), (b c)) should have type -> CELL
-✅ PASS ✅	Stores the first argument as the car. | cons((a b), (b c)) should have car -> (a b)
-✅ PASS ✅	Stores the second argument as the cdr. | cons((a b), (b c)) should have cdr -> (b c)
+✅ PASS 	Creates a new cell. | Actual: CELL | Expected: CELL
+
+✅ PASS 	Stores the first argument as the car. | Actual: (a b) | Expected: (a b)
+
+✅ PASS 	Stores the second argument as the cdr. | Actual: (b c) | Expected: (b c)
 
 
 🔎 Test: The second argument is NIL. | cons(a, ())
-✅ PASS ✅	Creates a new cell. | cons(a, ()) should have type -> CELL
-✅ PASS ✅	Stores the first argument as the car. | cons(a, ()) should have car -> a
-✅ PASS ✅	Stores the second argument as the cdr. | cons(a, ()) should have cdr -> ()
+✅ PASS 	Creates a new cell. | Actual: CELL | Expected: CELL
+
+✅ PASS 	Stores the first argument as the car. | Actual: a | Expected: a
+
+✅ PASS 	Stores the second argument as the cdr. | Actual: () | Expected: ()
 
 -----------------------------------------------------------
 ------------------------ TEST QUOTE -----------------------
 -----------------------------------------------------------
 📌 Note: Quote should return its argument without evaluating it.
 
-✅ PASS ✅	Returns an atom without evaluating it. | quote(a) -> a
+✅ PASS 	Returns an atom without evaluating it. | Actual: a | Expected: a
 
-✅ PASS ✅	Returns a list without evaluating it. | quote((a b)) -> (a b)
+✅ PASS 	Returns a list without evaluating it. | Actual: (a b) | Expected: (a b)
 
-✅ PASS ✅	Returns NIL without evaluating it. | quote(()) -> ()
+✅ PASS 	Returns NIL without evaluating it. | Actual: () | Expected: ()
 
 -----------------------------------------------------------
-------------------------- TEST EVAL -----------------------
+------------------ TEST SKIP WHITESPACE -------------------
 -----------------------------------------------------------
-📌 Note: Eval should evaluate atoms, NIL, and expressions containing the supported operations car, cdr, cons, quote, and eval.
+📌 Note: Next character should never be whitespace.
 
-✅ PASS ✅	Returns an atom unchanged. | eval(a) -> a
+✅ PASS 	Skips multiple spaces. | Actual: a | Expected: a
 
-✅ PASS ✅	Returns NIL unchanged. | eval(()) -> ()
+✅ PASS 	No spaces. | Actual: n | Expected: n
 
-✅ PASS ✅	Evaluates a simple car expression. | eval((car (a b c))) -> a
+✅ PASS 	Skips newline. | Actual: n | Expected: n
 
-✅ PASS ✅	Evaluates a simple cdr expression. | eval((cdr (a b c))) -> (b c)
+✅ PASS 	Skips tab. | Actual: t | Expected: t
 
-✅ PASS ✅	Evaluates a simple cons expression. | eval((cons a b)) -> (a . b)
-
-✅ PASS ✅	Evaluates a simple quote expression. | eval((quote a)) -> a
-
-✅ PASS ✅	Evaluates a simple eval expression. | eval((eval a)) -> a
-
-✅ PASS ✅	Evaluates car with a quoted list. | eval((car (quote (a b c)))) -> a
-
-✅ PASS ✅	Evaluates cdr with a quoted list. | eval((cdr (quote (a b c)))) -> (b c)
-
-✅ PASS ✅	Evaluates cons with quoted arguments. | eval((cons (quote a) (quote (b c)))) -> (a b c)
-
-✅ PASS ✅	Evaluates the result of another expression. | eval((eval (car (a b c)))) -> a
+✅ PASS 	Skips mixed whitespace. | Actual: r | Expected: r
 
 -----------------------------------------------------------
 ---------------------- TEST READ ATOM ---------------------
@@ -150,33 +180,45 @@
 
 
 🔎 Test: Reads letters as an atom.
-✅ PASS ✅	Creates the correct type. | readAtom should have type -> ATOM
-✅ PASS ✅	Stores the correct value. | readAtom should have value -> "abc"
+
+✅ PASS 	Creates the correct type. | Actual: ATOM | Expected: ATOM
+
+✅ PASS 	Stores the correct contents. | Actual: abc | Expected: abc
 
 
 🔎 Test: Reads a function name as an atom.
-✅ PASS ✅	Creates the correct type. | readAtom should have type -> ATOM
-✅ PASS ✅	Stores the correct value. | readAtom should have value -> "car"
+
+✅ PASS 	Creates the correct type. | Actual: ATOM | Expected: ATOM
+
+✅ PASS 	Stores the correct contents. | Actual: car | Expected: car
 
 
 🔎 Test: Reads numbers as an atom.
-✅ PASS ✅	Creates the correct type. | readAtom should have type -> ATOM
-✅ PASS ✅	Stores the correct value. | readAtom should have value -> "123"
+
+✅ PASS 	Creates the correct type. | Actual: ATOM | Expected: ATOM
+
+✅ PASS 	Stores the correct contents. | Actual: 123 | Expected: 123
 
 
 🔎 Test: Reads symbols as an atom.
-✅ PASS ✅	Creates the correct type. | readAtom should have type -> ATOM
-✅ PASS ✅	Stores the correct value. | readAtom should have value -> "+-="
+
+✅ PASS 	Creates the correct type. | Actual: ATOM | Expected: ATOM
+
+✅ PASS 	Stores the correct contents. | Actual: +-= | Expected: +-=
 
 
 🔎 Test: Reads an atom followed by a closing parenthesis.
-✅ PASS ✅	Creates the correct type. | readAtom should have type -> ATOM
-✅ PASS ✅	Stores the correct value. | readAtom should have value -> "par"
+
+✅ PASS 	Creates the correct type. | Actual: ATOM | Expected: ATOM
+
+✅ PASS 	Stores the correct contents. | Actual: par | Expected: par
 
 
 🔎 Test: Reads an atom followed by whitespace.
-✅ PASS ✅	Creates the correct type. | readAtom should have type -> ATOM
-✅ PASS ✅	Stores the correct value. | readAtom should have value -> "space"
+
+✅ PASS 	Creates the correct type. | Actual: ATOM | Expected: ATOM
+
+✅ PASS 	Stores the correct contents. | Actual: space | Expected: space
 
 -----------------------------------------------------------
 ---------------------- TEST READ LIST ---------------------
@@ -185,24 +227,31 @@
 
 
 🔎 Test: Reads an empty list.
-✅ PASS ✅	Creates the correct type. | readList should have type -> NIL
+
+✅ PASS 	Creates the correct type. | Actual: NIL | Expected: NIL
+
+✅ PASS 	Stores the correct contents. | Actual: () | Expected: ()
+
 
 🔎 Test: Reads a list containing one atom.
-✅ PASS ✅	Creates the correct type. | readList should have type -> CELL
-✅ PASS ✅	Stores the correct contents. | readList should contain -> (a)
-✅ PASS ✅	Ends the list correctly. | readList should end with -> NIL
+
+✅ PASS 	Creates the correct type. | Actual: CELL | Expected: CELL
+
+✅ PASS 	Stores the correct contents. | Actual: (a) | Expected: (a)
 
 
 🔎 Test: Reads a list containing multiple atoms.
-✅ PASS ✅	Creates the correct type. | readList should have type -> CELL
-✅ PASS ✅	Stores the correct contents. | readList should contain -> (a b c)
-✅ PASS ✅	Ends the list correctly. | readList should end with -> NIL
+
+✅ PASS 	Creates the correct type. | Actual: CELL | Expected: CELL
+
+✅ PASS 	Stores the correct contents. | Actual: (a b c) | Expected: (a b c)
 
 
 🔎 Test: Reads a list containing a nested list.
-✅ PASS ✅	Creates the correct type. | readList should have type -> CELL
-✅ PASS ✅	Stores the correct contents. | readList should contain -> ((a b) c)
-✅ PASS ✅	Ends the list correctly. | readList should end with -> NIL
+
+✅ PASS 	Creates the correct type. | Actual: CELL | Expected: CELL
+
+✅ PASS 	Stores the correct contents. | Actual: ((a b) c) | Expected: ((a b) c)
 
 -----------------------------------------------------------
 ---------------------- TEST READ EXPR ---------------------
@@ -211,49 +260,156 @@
 
 
 🔎 Test: Reads an atom.
-✅ PASS ✅	Creates the correct type. | readExpr should have type -> ATOM
-✅ PASS ✅	Stores the correct contents. | readExpr should contain -> abc
+
+✅ PASS 	Creates the correct type. | Actual: ATOM | Expected: ATOM
+
+✅ PASS 	Stores the correct contents. | Actual: abc | Expected: abc
 
 
 🔎 Test: Reads a list.
-✅ PASS ✅	Creates the correct type. | readExpr should have type -> CELL
-✅ PASS ✅	Stores the correct contents. | readExpr should contain -> (a b c)
+
+✅ PASS 	Creates the correct type. | Actual: CELL | Expected: CELL
+
+✅ PASS 	Stores the correct contents. | Actual: (a b c) | Expected: (a b c)
 
 
 🔎 Test: Reads quote shorthand for an atom.
-✅ PASS ✅	Creates the correct type. | readExpr should have type -> CELL
-✅ PASS ✅	Stores the correct contents. | readExpr should contain -> (quote a)
+
+✅ PASS 	Creates the correct type. | Actual: CELL | Expected: CELL
+
+✅ PASS 	Stores the correct contents. | Actual: (quote a) | Expected: (quote a)
 
 
 🔎 Test: Reads quote shorthand for a list.
-✅ PASS ✅	Creates the correct type. | readExpr should have type -> CELL
-✅ PASS ✅	Stores the correct contents. | readExpr should contain -> (quote (a b c))
+
+✅ PASS 	Creates the correct type. | Actual: CELL | Expected: CELL
+
+✅ PASS 	Stores the correct contents. | Actual: (quote (a b c)) | Expected: (quote (a b c))
 
 
 🔎 Test: Reads an empty list.
-✅ PASS ✅	Creates the correct type. | readExpr should have type -> NIL
-✅ PASS ✅	Stores the correct contents. | readExpr should contain -> NIL
+
+✅ PASS 	Creates the correct type. | Actual: NIL | Expected: NIL
+
+✅ PASS 	Stores the correct contents. | Actual: () | Expected: ()
 
 -----------------------------------------------------------
 ---------------------- TEST PRINT EXPR --------------------
 -----------------------------------------------------------
 📌 Note: printExpr should print an S-expression in the correct format.
 
-✅ PASS ✅	Prints an atom. | printed -> a, expected a
+✅ PASS 	Prints an atom. | Actual: a | Expected: a
 
-✅ PASS ✅	Prints NIL. | printed -> (), expected ()
+✅ PASS 	Prints NIL. | Actual: () | Expected: ()
 
-✅ PASS ✅	Prints a list. | printed -> (a b c), expected (a b c)
+✅ PASS 	Prints a single-element list. | Actual: (a) | Expected: (a)
 
-✅ PASS ✅	Prints a nested list. | printed -> ((a b) c), expected ((a b) c)
+✅ PASS 	Prints a list. | Actual: (a b c) | Expected: (a b c)
 
-✅ PASS ✅	Prints a dotted pair. | printed -> (a . b), expected (a . b)
+✅ PASS 	Prints a nested list. | Actual: ((a b) c) | Expected: ((a b) c)
+
+✅ PASS 	Prints a dotted pair. | Actual: (a . b) | Expected: (a . b)
 
 -----------------------------------------------------------
 ---------------------- TEST PRINT LIST --------------------
 -----------------------------------------------------------
 📌 Note: printList should print the contents of a list in the correct format without the parentheses.
 
-✅ PASS ✅	Prints the contents of a proper list. | printed -> a b c, expected a b c
+✅ PASS 	Prints the contents of a proper list. | Actual: a b c | Expected: a b c
 
-✅ PASS ✅	Prints the contents of a dotted pair. | printed -> a . b, expected a . b
+✅ PASS 	Prints the contents of a dotted pair. | Actual: a . b | Expected: a . b
+
+✅ PASS 	Prints the contents of a nested list. | Actual: (a b) c | Expected: (a b) c
+
+-----------------------------------------------------------
+--------------------- TEST MAKE PAIR ----------------------
+-----------------------------------------------------------
+📌 Note: makePair should create a list containing a name and its value.
+
+✅ PASS 	Creates a pair with type CELL. | Actual: CELL | Expected: CELL
+
+✅ PASS 	Stores the name as the first element. | Actual: a | Expected: a
+
+✅ PASS 	Stores the value as the second element. | Actual: 2 | Expected: 2
+
+✅ PASS 	Ends the pair with NIL. | Actual: () | Expected: ()
+
+-----------------------------------------------------------
+----------------------- TEST LOOKUP -----------------------
+-----------------------------------------------------------
+📌 Note: Lookup should return the most recent value associated with a symbol or return the symbol itself if it is undefined.
+
+✅ PASS 	Finds the value associated with a symbol. | Actual: 2 | Expected: 2
+
+✅ PASS 	Finds another value in the environment. | Actual: 4 | Expected: 4
+
+✅ PASS 	Returns an undefined symbol unchanged. | Actual: x | Expected: x
+
+✅ PASS 	Returns the most recent value when a symbol is defined again. | Actual: 10 | Expected: 10
+
+-----------------------------------------------------------
+------------------------- TEST SET ------------------------
+-----------------------------------------------------------
+📌 Note: Set should store a value in the environment and return the assigned value.
+
+✅ PASS 	Returns the value assigned to a symbol. | Actual: 2 | Expected: 2
+
+✅ PASS 	Evaluates a defined symbol to its value. | Actual: 2 | Expected: 2
+
+✅ PASS 	Returns the new value when a symbol is redefined. | Actual: 10 | Expected: 10
+
+✅ PASS 	Keeps the previous definition when a symbol is redefined. | Actual: 2 | Expected: 2
+
+✅ PASS 	Evaluates a redefined symbol to its most recent value. | Actual: 10 | Expected: 10
+
+-----------------------------------------------------------
+-------------------- TEST PREDICATES ----------------------
+-----------------------------------------------------------
+📌 Note: Predicates should return T when true and NIL when false.
+
+✅ PASS 	nil? returns true for NIL. | Actual: T | Expected: T
+
+✅ PASS 	nil? returns false for an atom. | Actual: () | Expected: ()
+
+✅ PASS 	atom? returns true for an atom. | Actual: T | Expected: T
+
+✅ PASS 	atom? returns false for a list. | Actual: () | Expected: ()
+
+✅ PASS 	list? returns true for a list. | Actual: T | Expected: T
+
+✅ PASS 	list? returns false for an atom. | Actual: () | Expected: ()
+
+✅ PASS 	not? returns true for NIL. | Actual: T | Expected: T
+
+✅ PASS 	not? returns false for a non-NIL value. | Actual: () | Expected: ()
+
+✅ PASS 	number? returns true for a numeric atom. | Actual: T | Expected: T
+
+✅ PASS 	number? returns false for a nonnumeric atom. | Actual: () | Expected: ()
+
+-----------------------------------------------------------
+------------------------- TEST EVAL -----------------------
+-----------------------------------------------------------
+📌 Note: Eval should correctly evaluate supported S-expressions and operations.
+
+✅ PASS 	Returns an undefined atom unchanged. | Actual: a | Expected: a
+
+✅ PASS 	Returns NIL unchanged. | Actual: () | Expected: ()
+
+✅ PASS 	Evaluates a simple car expression. | Actual: a | Expected: a
+
+✅ PASS 	Evaluates a simple cdr expression. | Actual: (b c) | Expected: (b c)
+
+✅ PASS 	Evaluates a simple cons expression. | Actual: (a . b) | Expected: (a . b)
+
+✅ PASS 	Evaluates a simple quote expression. | Actual: a | Expected: a
+
+✅ PASS 	Evaluates a simple eval expression. | Actual: a | Expected: a
+
+✅ PASS 	Evaluates car with a quoted list. | Actual: a | Expected: a
+
+✅ PASS 	Evaluates cdr with a quoted list. | Actual: (b c) | Expected: (b c)
+
+✅ PASS 	Evaluates cons with quoted arguments. | Actual: (a b c) | Expected: (a b c)
+
+✅ PASS 	Evaluates the result of another expression. | Actual: a | Expected: a

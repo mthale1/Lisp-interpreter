@@ -29,3 +29,35 @@ a
 (cdr (cons 'a 'b))
 (cons (car '(a b c)) '(x y))
 (cons (cdr '(a b c)) '(x y))
+
+(set a 2)
+a
+(set b 4)
+b
+a
+x
+
+(set a 10)
+a
+b
+
+(set c a)
+c
+
+(nil? ())
+(nil? 'T)
+
+(atom? x)
+(atom? (x))
+
+(list? 'T)
+(list? x)
+(list? (x))
+
+(not? ())
+(not? 'T)
+
+(number? 42)
+(number? -42)
+(number? x)
+(number? 'abc)

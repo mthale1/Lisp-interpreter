@@ -6,6 +6,8 @@
 
 using namespace std;
 
+SExpr* rho = makeNil();
+
 // Ignore whitespace characters in the input.
 void skipWhitespace(){
 
@@ -50,6 +52,50 @@ bool isNil(SExpr* expr){
     return expr->type == Type::NIL;
 }
 
+// Returns true if the S-expression is an atom representing a valid integer.
+bool isNumber(SExpr* expr){
+
+    if (!isAtom(expr)){
+        return false;
+    }
+
+    string value = expr->atom;
+
+    if (value.empty()){
+        return false;
+    }
+
+    int start = 0;
+
+    if (value[0] == '-'){
+        if (value.length() == 1){
+            return false;
+        }
+
+        start = 1;
+    }
+
+    for (int i = start; i < value.length(); i++){
+        if (!isdigit(value[i])){
+            return false;
+        }
+    }
+
+    return true;
+}
+
+// Converts an atom representing an integer into a C++ integer.
+int symbolToInt(SExpr* expr){
+
+    return stoi(expr->atom);
+}
+
+// Converts a C++ integer into an atom S-expression.
+SExpr* intToSymbol(int value){
+
+    return makeAtom(to_string(value));
+}
+
 // Returns the first element of a cell.
 SExpr* car(SExpr* expr){
     return expr->car;
@@ -77,64 +123,13 @@ SExpr* quote(SExpr* expr){
     return expr;
 }
 
-// Evaluates an S-expression by recognizing and executing
-// supported operations such as car, cdr, cons, quote, and eval.
-SExpr* eval(SExpr* expr){
-
-    if (isAtom(expr)){
-        return expr;
-    }
-
-    if (isNil(expr)){
-        return expr;
-    }
-
-    if (isAtom(car(expr))) {
-        string symbol = car(expr)->atom;
-
-        if (symbol == "car"){
-            SExpr* argument = car(cdr(expr));
-            SExpr* evaluatedArgument = eval(argument);
-
-            return car(evaluatedArgument);
-        }
-        else if (symbol == "cdr"){
-            SExpr* argument = car(cdr(expr));
-            SExpr* evaluatedArgument = eval(argument);
-
-            return cdr(evaluatedArgument);
-        }
-        else if (symbol == "cons"){
-            SExpr* argument1 = car(cdr(expr));
-            SExpr* argument2 = car(cdr(cdr(expr)));
-
-            SExpr* evaluatedArgument1 = eval(argument1);
-            SExpr* evaluatedArgument2 = eval(argument2);
-
-            return cons(evaluatedArgument1, evaluatedArgument2);
-        }
-        else if (symbol == "quote"){
-            SExpr* argument = car(cdr(expr));
-            return quote(argument);
-        }
-        else if (symbol == "eval"){
-            SExpr* argument = car(cdr(expr));
-            SExpr* evaluatedArgument = eval(argument);
-
-            return eval(evaluatedArgument);
-        }
-    }
-    
-    return expr;
-}
-
 // Reads a symbol from input & returns it as an atom.
 SExpr* readAtom(){
 
     string symbol;
 
-    // while the next character is not whitespace or parentheses, add the next character to `symbol`.
-    while (cin && !isspace(cin.peek()) && cin.peek() != '(' && cin.peek() != ')'){
+    // while the next character is not EOF, whitespace, or parentheses, add it to `symbol`.
+    while (cin.peek() != EOF && !isspace(cin.peek()) && cin.peek() != '(' && cin.peek() != ')'){
         symbol += cin.get();
     }
 
@@ -173,8 +168,8 @@ SExpr* readExpr(){
     else if (cin.peek() == '\'') {
         cin.get();
         
-        SExpr* quotedExpr = readExpr(); // read expression after the '
-        SExpr* quoteAtom = makeAtom("quote"); // create quote
+        SExpr* quotedExpr = readExpr();
+        SExpr* quoteAtom = makeAtom("quote");
         SExpr* quotedList= cons(quotedExpr, makeNil());
 
         return cons(quoteAtom, quotedList);
@@ -225,21 +220,127 @@ void printList(SExpr* expr){
 
 }
 
-// Frees memory used by an S-expression.
-void freeExpr(SExpr* expr){
+// Creates & returns a list containing a name and its value.
+SExpr* makePair(SExpr* name, SExpr* value) {
+    return cons(name, cons(value, makeNil()));
+}
 
-    if (expr == nullptr)
-    {
-        return;
+// Searches rho for a symbol and returns its assigned value.
+SExpr* lookup(SExpr* symbol) {
+    SExpr* current = rho;
+
+    while (!isNil(current)){
+        SExpr* pair = car(current);
+        SExpr* name = car(pair);
+
+        if (name->atom == symbol->atom){
+            return car(cdr(pair));
+        }
+
+        current = cdr(current);
     }
 
-    if (expr->type == Type::CELL)
-    {
-        freeExpr(expr->car);
-        freeExpr(expr->cdr);
+    return symbol;
+}
+
+// Evaluates an S-expression by recognizing and executing supported operations, assignments, and predicates.
+SExpr* eval(SExpr* expr){
+
+    if (isAtom(expr)){
+        return lookup(expr);
     }
 
-    delete expr;
+    if (isNil(expr)){
+        return expr;
+    }
+
+    if (isAtom(car(expr))) {
+        string symbol = car(expr)->atom;
+
+        if (symbol == "set") {
+            SExpr* name = car(cdr(expr));
+            SExpr* value = car(cdr(cdr(expr)));
+
+            SExpr* evaluatedValue = eval(value);
+
+            rho = cons(makePair(name, evaluatedValue), rho);
+
+            return evaluatedValue;
+        }
+        else if (symbol == "nil?" || symbol == "not?"){
+            SExpr* argument = car(cdr(expr));
+            SExpr* evaluatedArgument = eval(argument);
+
+            if (isNil(evaluatedArgument)){
+                return makeAtom("T");
+            }
+
+            return makeNil();
+        }
+        else if (symbol == "atom?"){
+            SExpr* argument = car(cdr(expr));
+            SExpr* evaluatedArgument = eval(argument);
+
+            if (isAtom(evaluatedArgument)){
+                return makeAtom("T");
+            }
+
+            return makeNil();
+        }
+        else if (symbol == "list?"){
+            SExpr* argument = car(cdr(expr));
+            SExpr* evaluatedArgument = eval(argument);
+
+            if (evaluatedArgument->type == Type::CELL){
+                return makeAtom("T");
+            }
+
+            return makeNil();
+        }
+        else if (symbol == "number?"){
+            SExpr* argument = car(cdr(expr));
+            SExpr* evaluatedArgument = eval(argument);
+
+            if (isNumber(evaluatedArgument)){
+                return makeAtom("T");
+            }
+
+            return makeNil();
+        }
+        else if (symbol == "car"){
+            SExpr* argument = car(cdr(expr));
+            SExpr* evaluatedArgument = eval(argument);
+
+            return car(evaluatedArgument);
+        }
+        else if (symbol == "cdr"){
+            SExpr* argument = car(cdr(expr));
+            SExpr* evaluatedArgument = eval(argument);
+
+            return cdr(evaluatedArgument);
+        }
+        else if (symbol == "cons"){
+            SExpr* argument1 = car(cdr(expr));
+            SExpr* argument2 = car(cdr(cdr(expr)));
+
+            SExpr* evaluatedArgument1 = eval(argument1);
+            SExpr* evaluatedArgument2 = eval(argument2);
+
+            return cons(evaluatedArgument1, evaluatedArgument2);
+        }
+        else if (symbol == "quote"){
+            SExpr* argument = car(cdr(expr));
+            return quote(argument);
+        }
+        else if (symbol == "eval"){
+            SExpr* argument = car(cdr(expr));
+            SExpr* evaluatedArgument = eval(argument);
+
+            return eval(evaluatedArgument);
+        }
+    }
+    
+    return expr;
 }
 
 // Repeatedly reads and prints S-expressions until EOF (End-of-File).
@@ -260,7 +361,6 @@ void mainLoop(){
             printExpr(result);
             cout << endl;
 
-            // freeExpr(expr);
         }
 
 }
