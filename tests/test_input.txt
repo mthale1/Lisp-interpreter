@@ -61,3 +61,41 @@ c
 (number? -42)
 (number? x)
 (number? 'abc)
+
+(and? 'T 'T)
+(and? 'T ())
+(and? () 'T)
+(and? 'T 'a)
+
+(or? 'T ())
+(or? () 'T)
+(or? () ())
+(or? () 'a)
+
+(eq? 'a 'a)
+(eq? 'a 'b)
+(eq? 'a ())
+(eq? () ())
+(eq? '(a) '(a))
+
+(if 'T 'yes 'no)
+(if () 'yes 'no)
+(if 'a 'yes 'no)
+
+(cond ('T 'first () 'second))
+(cond (() 'first 'T 'second))
+(cond (() 'first () 'second 'T 'default))
+
+(and? () (set x 1))
+x
+
+(or? 'T (set y 1))
+y
+
+(if 'T 'yes (set z 1))
+z
+(if () (set w 1) 'no)
+w
+
+(cond ('T 'first 'T (set q 1)))
+q

@@ -77,6 +77,21 @@ void checkPrintOutput(void (*printFunction)(SExpr*), SExpr* expr, string expecte
     check(output.str() == expected, test, output.str(), expected);
 }
 
+// readExpr() is tested separately. This helper uses readExpr() to make other tests easier to read by allowing 
+// complete Lisp expressions to be evaluated directly from strings instead of manually building them with cons().
+SExpr* evalString(string input){
+    istringstream testInput(input);
+    streambuf* originalCin = cin.rdbuf(testInput.rdbuf());
+
+    cin.clear();
+    SExpr* expr = readExpr();
+
+    cin.rdbuf(originalCin);
+    cin.clear();
+
+    return eval(expr);
+}
+
 void testMakeAtom(){
     cout << "\n-----------------------------------------------------------" << endl;
     cout << "--------------------- TEST MAKE ATOM ----------------------" << endl;
@@ -86,14 +101,14 @@ void testMakeAtom(){
     SExpr* result;
 
     result = makeAtom("string");
-    check(result->type == Type::ATOM, "Creates an S-expression with the correct type.", result->type == Type::ATOM ? "ATOM" : "NOT ATOM", "ATOM");
-    check(result->atom == "string", "Stores the correct atom value.", result->atom, "string");
+    check(result->type == Type::ATOM, "Creates an S-expression with the correct type: makeAtom(\"string\")", result->type == Type::ATOM ? "ATOM" : "NOT ATOM", "ATOM");
+    check(result->atom == "string", "Stores the correct atom value: makeAtom(\"string\")", result->atom, "string");
 
     result = makeAtom("123");
-    check(result->atom == "123", "Stores numbers as atom text.", result->atom, "123");
+    check(result->atom == "123", "Stores numbers as atom text: makeAtom(\"123\")", result->atom, "123");
 
     result = makeAtom("+-=");
-    check(result->atom == "+-=", "Stores symbols as atom text.", result->atom, "+-=");
+    check(result->atom == "+-=", "Stores symbols as atom text: makeAtom(\"+-=\")", result->atom, "+-=");
 }
 
 void testMakeNil(){
@@ -104,7 +119,7 @@ void testMakeNil(){
 
     SExpr* result = makeNil();
 
-    check(result->type == Type::NIL, "Creates an S-expression with the correct type.", result->type == Type::NIL ? "NIL" : "NOT NIL", "NIL");
+    check(result->type == Type::NIL, "Creates an S-expression with the correct type: makeNil()", result->type == Type::NIL ? "NIL" : "NOT NIL", "NIL");
 }
 
 void testIsAtom(){
@@ -117,9 +132,9 @@ void testIsAtom(){
     SExpr* nil = makeNil();
     SExpr* cell = cons(atom, nil);
 
-    check(isAtom(atom), "Identifies an atom as an atom.", isAtom(atom) ? "true" : "false", "true");
-    check(!isAtom(nil), "Does not identify NIL as an atom.", isAtom(nil) ? "true" : "false", "false");
-    check(!isAtom(cell), "Does not identify a cell as an atom.", isAtom(cell) ? "true" : "false", "false");
+    check(isAtom(atom), "Returns true for an atom: isAtom(atom)", isAtom(atom) ? "true" : "false", "true");
+    check(!isAtom(nil), "Returns false for (): isAtom(nil)", isAtom(nil) ? "true" : "false", "false");
+    check(!isAtom(cell), "Returns false for a cell: isAtom(cell)", isAtom(cell) ? "true" : "false", "false");
 }
 
 void testIsNil(){
@@ -132,9 +147,9 @@ void testIsNil(){
     SExpr* nil = makeNil();
     SExpr* cell = cons(atom, nil);
 
-    check(isNil(nil), "Identifies NIL as NIL.", isNil(nil) ? "true" : "false", "true");
-    check(!isNil(atom), "Does not identify an atom as NIL.", isNil(atom) ? "true" : "false", "false");
-    check(!isNil(cell), "Does not identify a cell as NIL.", isNil(cell) ? "true" : "false", "false");
+    check(isNil(nil), "Returns true for (): isNil(nil)", isNil(nil) ? "true" : "false", "true");
+    check(!isNil(atom), "Returns false for an atom: isNil(atom)", isNil(atom) ? "true" : "false", "false");
+    check(!isNil(cell), "Returns false for a cell: isNil(cell)", isNil(cell) ? "true" : "false", "false");
 }
 
 void testIsNumber(){
@@ -146,22 +161,22 @@ void testIsNumber(){
     SExpr* input;
 
     input = makeAtom("123");
-    check(isNumber(input), "Identifies a positive integer.", isNumber(input) ? "true" : "false", "true");
+    check(isNumber(input), "Returns true for a positive integer: isNumber(123)", isNumber(input) ? "true" : "false", "true");
 
     input = makeAtom("-42");
-    check(isNumber(input), "Identifies a negative integer.", isNumber(input) ? "true" : "false", "true");
+    check(isNumber(input), "Returns true for a negative integer: isNumber(-42)", isNumber(input) ? "true" : "false", "true");
 
     input = makeAtom("abc");
-    check(!isNumber(input), "Does not identify letters as an integer.", isNumber(input) ? "true" : "false", "false");
+    check(!isNumber(input), "Returns false for letters: isNumber(abc)", isNumber(input) ? "true" : "false", "false");
 
     input = makeAtom("12a");
-    check(!isNumber(input), "Does not identify mixed characters as an integer.", isNumber(input) ? "true" : "false", "false");
+    check(!isNumber(input), "Returns false for mixed characters: isNumber(12a)", isNumber(input) ? "true" : "false", "false");
 
     input = makeAtom("-");
-    check(!isNumber(input), "Does not identify a minus sign alone as an integer.", isNumber(input) ? "true" : "false", "false");
+    check(!isNumber(input), "Returns false for a minus sign alone: isNumber(-)", isNumber(input) ? "true" : "false", "false");
 
     input = makeNil();
-    check(!isNumber(input), "Does not identify NIL as an integer.", isNumber(input) ? "true" : "false", "false");
+    check(!isNumber(input), "Returns false for (): isNumber(nil)", isNumber(input) ? "true" : "false", "false");
 }
 
 void testSymbolToInt(){
@@ -170,9 +185,9 @@ void testSymbolToInt(){
     cout << "-----------------------------------------------------------" << endl;
     cout << "📌 Note: symbolToInt should convert an atom representing an integer into a C++ integer." << endl;
 
-    check(symbolToInt(makeAtom("123")) == 123, "Converts a positive numeric atom to an integer.",to_string(symbolToInt(makeAtom("123"))), "123");
-    check(symbolToInt(makeAtom("-42")) == -42, "Converts a negative numeric atom to an integer.", to_string(symbolToInt(makeAtom("-42"))), "-42");
-    check(symbolToInt(makeAtom("0")) == 0, "Converts zero to an integer.", to_string(symbolToInt(makeAtom("0"))), "0");
+    check(symbolToInt(makeAtom("123")) == 123, "Converts a positive numeric atom to an integer: symbolToInt(123)",to_string(symbolToInt(makeAtom("123"))), "123");
+    check(symbolToInt(makeAtom("-42")) == -42, "Converts a negative numeric atom to an integer: symbolToInt(-42)", to_string(symbolToInt(makeAtom("-42"))), "-42");
+    check(symbolToInt(makeAtom("0")) == 0, "Converts zero to an integer: symbolToInt(0)", to_string(symbolToInt(makeAtom("0"))), "0");
 }
 
 void testIntToSymbol(){
@@ -184,13 +199,13 @@ void testIntToSymbol(){
     SExpr* result;
 
     result = intToSymbol(123);
-    check(result->type == Type::ATOM && result->atom == "123", "Converts a positive integer to a numeric atom.", exprToString(result), "123");
+    check(result->type == Type::ATOM && result->atom == "123", "Converts a positive integer to a numeric atom: intToSymbol(123)", exprToString(result), "123");
 
     result = intToSymbol(-42);
-    check(result->type == Type::ATOM && result->atom == "-42", "Converts a negative integer to a numeric atom.", exprToString(result), "-42");
+    check(result->type == Type::ATOM && result->atom == "-42", "Converts a negative integer to a numeric atom: intToSymbol(-42)", exprToString(result), "-42");
 
     result = intToSymbol(0);
-    check(result->type == Type::ATOM && result->atom == "0", "Converts zero to a numeric atom.", exprToString(result), "0");
+    check(result->type == Type::ATOM && result->atom == "0", "Converts zero to a numeric atom: intToSymbol(0)", exprToString(result), "0");
 }
 
 void testCar() {
@@ -207,14 +222,14 @@ void testCar() {
 
     SExpr* listBC = cons(b, cons(c, nil));
     SExpr* listABC = cons(a, listBC);
-    check(car(listABC) == a, "Returns an atom stored in the car of a list.", exprToString(car(listABC)), "a");
+    check(car(listABC) == a, "Returns the first atom of a list: car((a b c))", exprToString(car(listABC)), "a");
 
     SExpr* listAB = cons(a, b); 
     SExpr* listABCD = cons(listAB, cons(c, cons(d, nil)));
-    check(car(listABCD) == listAB, "Returns a nested list stored in the car of a list.", exprToString(car(listABCD)), "(a . b)");
+    check(car(listABCD) == listAB, "Returns a nested expression from the car: car(((a . b) c d))", exprToString(car(listABCD)), "(a . b)");
 
     SExpr* dottedPair = cons(a, b);
-    check(car(dottedPair) == a, "Returns the car of a dotted pair.", exprToString(car(dottedPair)), "a");
+    check(car(dottedPair) == a, "Returns the first atom of a dotted pair: car((a . b))", exprToString(car(dottedPair)), "a");
 }
 
 void testCdr() {
@@ -232,21 +247,21 @@ void testCdr() {
 
     SExpr* listBC = cons(b, cons(c, nil));
     SExpr* listABC = cons(a, listBC);
-    check(cdr(listABC) == listBC, "Returns the rest of a list.", exprToString(cdr(listABC)), "(b c)");
+    check(cdr(listABC) == listBC, "Returns all elements after the first element: cdr((a b c))", exprToString(cdr(listABC)), "(b c)");
 
     SExpr* listAB = cons(a, cons(b, nil));
     SExpr* listCD = cons(c, cons(d, nil));
     SExpr* listABCD = cons(listAB, listCD);
-    check(cdr(listABCD) == listCD, "Returns the rest of a nested list.", exprToString(cdr(listABCD)), "(c d)");
+    check(cdr(listABCD) == listCD, "Returns all elements after the first element of a nested list: cdr(((a b) c d))", exprToString(cdr(listABCD)), "(c d)");
 
     SExpr* dottedPair = cons(a, b);
-    check(cdr(dottedPair) == b, "Returns the cdr of a dotted pair.", exprToString(cdr(dottedPair)), "b");
+    check(cdr(dottedPair) == b, "Returns the second part of a dotted pair: cdr((a . b))", exprToString(cdr(dottedPair)), "b");
 }
 
-void checkCons(SExpr* first, SExpr* second, string description, string test, string carExpected, string cdrExpected){
+void checkCons(SExpr* first, SExpr* second, string description, string carExpected, string cdrExpected){
     SExpr* result = cons(first, second);
 
-    cout << "\n\n🔎 Test: " << description << " | " << test;
+    cout << "\n\n🔎 Test: " << description;
 
     check(result->type == Type::CELL, "Creates a new cell.", result->type == Type::CELL ? "CELL" : "NOT CELL", "CELL");
     check(result->car == first, "Stores the first argument as the car.", exprToString(result->car), carExpected);
@@ -267,11 +282,11 @@ void testCons() {
     SExpr* listAB = cons(a, cons(b, nil));
     SExpr* listBC = cons(b, cons(c, nil));
 
-    checkCons(a, b, "Both arguments are atoms.", "cons(a, b)", "a", "b");
-    checkCons(a, listBC, "The first argument is an atom and the second is a list.", "cons(a, (b c))", "a", "(b c)");
-    checkCons(listAB, c, "The first argument is a list and the second is an atom.", "cons((a b), c)", "(a b)", "c");
-    checkCons(listAB, listBC, "Both arguments are lists.", "cons((a b), (b c))", "(a b)", "(b c)");
-    checkCons(a, nil, "The second argument is NIL.", "cons(a, ())", "a", "()");
+    checkCons(a, b, "Cons with two atoms: cons(a, b)", "a", "b");
+    checkCons(a, listBC, "Cons with an atom and a list: cons(a, (b c))", "a", "(b c)");
+    checkCons(listAB, c, "Cons with a list and an atom: cons((a b), c)", "(a b)", "c");
+    checkCons(listAB, listBC, "Cons with two lists: cons((a b), (b c))", "(a b)", "(b c)");
+    checkCons(a, nil, "Cons with an atom and (): cons(a, ())", "a", "()");
     
 }
 
@@ -287,9 +302,9 @@ void testQuote(){
 
     SExpr* listAB = cons(a, cons(b, nil));
 
-    check(quote(a) == a, "Returns an atom without evaluating it.", exprToString(quote(a)), "a");
-    check(quote(listAB) == listAB, "Returns a list without evaluating it.", exprToString(quote(listAB)), "(a b)");
-    check(quote(nil) == nil, "Returns NIL without evaluating it.", exprToString(quote(nil)), "()");
+    check(quote(a) == a, "Returns an atom without evaluating it: quote(a)", exprToString(quote(a)), "a");
+    check(quote(listAB) == listAB, "Returns a list without evaluating it: quote((a b))", exprToString(quote(listAB)), "(a b)");
+    check(quote(nil) == nil, "Returns () without evaluating it: quote(())", exprToString(quote(nil)), "()");
 }
 
 void checkSkipWhitespace(string inputText, char expectedCharacter, string test){
@@ -309,13 +324,13 @@ void testSkipWhitespace(){
     cout << "\n-----------------------------------------------------------" << endl;
     cout << "------------------ TEST SKIP WHITESPACE -------------------" << endl;
     cout << "-----------------------------------------------------------" << endl;
-    cout << "📌 Note: Next character should never be whitespace." << endl;
+    cout << "📌 Note: skipWhitespace should skip leading whitespace, so the next character should not be whitespace." << endl;
 
-    checkSkipWhitespace("   a", 'a', "Skips multiple spaces.");
-    checkSkipWhitespace("nospaces", 'n', "No spaces.");
-    checkSkipWhitespace("\nnewline", 'n', "Skips newline.");
-    checkSkipWhitespace("\ttab", 't', "Skips tab.");
-    checkSkipWhitespace(" \n\trandom", 'r', "Skips mixed whitespace.");
+    checkSkipWhitespace("   a", 'a', "Skips multiple spaces: \"   a\"");
+    checkSkipWhitespace("nospaces", 'n', "Leaves input unchanged when there is no whitespace: \"nospaces\"");
+    checkSkipWhitespace("\nnewline", 'n', "Skips a newline: \"\\nnewline\"");
+    checkSkipWhitespace("\ttab", 't', "Skips a tab: \"\\ttab\"");
+    checkSkipWhitespace(" \n\trandom", 'r', "Skips mixed whitespace: \" \\n\\trandom\"");
 }
 
 void testReadAtom(){
@@ -324,12 +339,12 @@ void testReadAtom(){
     cout << "-----------------------------------------------------------" << endl;
     cout << "📌 Note: readAtom should read characters and create an atom with the correct value." << endl;
 
-    checkReadOutput(readAtom, "abc ", makeAtom("abc"), "Reads letters as an atom.");
-    checkReadOutput(readAtom, "car ", makeAtom("car"), "Reads a function name as an atom.");
-    checkReadOutput(readAtom, "123 ", makeAtom("123"), "Reads numbers as an atom.");
-    checkReadOutput(readAtom, "+-= ", makeAtom("+-="), "Reads symbols as an atom.");
-    checkReadOutput(readAtom, "par)", makeAtom("par"), "Reads an atom followed by a closing parenthesis.");
-    checkReadOutput(readAtom, "space ", makeAtom("space"), "Reads an atom followed by whitespace.");
+    checkReadOutput(readAtom, "abc ", makeAtom("abc"), "Reads letters as an atom: \"abc \"");
+    checkReadOutput(readAtom, "car ", makeAtom("car"), "Reads a function name as an atom: \"car \"");
+    checkReadOutput(readAtom, "123 ", makeAtom("123"), "Reads numbers as an atom: \"123 \"");
+    checkReadOutput(readAtom, "+-= ", makeAtom("+-="), "Reads symbols as an atom: \"+-= \"");
+    checkReadOutput(readAtom, "par)", makeAtom("par"), "Stops reading an atom at a closing parenthesis: \"par)\"");
+    checkReadOutput(readAtom, "space ", makeAtom("space"), "Stops reading an atom at whitespace: \"space \"");
 }
 
 void testReadList(){
@@ -346,17 +361,17 @@ void testReadList(){
     SExpr* expr;
 
     expr = nil;
-    checkReadOutput(readList, ")", expr, "Reads an empty list.");
+    checkReadOutput(readList, ")", expr, "Reads an empty list: \")\"");
 
     expr = cons(a, nil);
-    checkReadOutput(readList, "a)", expr, "Reads a list containing one atom.");
+    checkReadOutput(readList, "a)", expr, "Reads a list containing one atom: \"a)\"");
 
     expr = cons(a, cons(b, cons(c, nil)));
-    checkReadOutput(readList, "a b c)", expr, "Reads a list containing multiple atoms.");
+    checkReadOutput(readList, "a b c)", expr, "Reads a list containing multiple atoms: \"a b c)\"");
 
     SExpr* listAB = cons(a, cons(b, nil));
     expr = cons(listAB, cons(c, nil));
-    checkReadOutput(readList, "(a b) c)", expr, "Reads a list containing a nested list.");
+    checkReadOutput(readList, "(a b) c)", expr, "Reads a list containing a nested list: \"(a b) c)\"");
 }
 
 void testReadExpr(){
@@ -377,17 +392,17 @@ void testReadExpr(){
 
     SExpr* expr;
 
-    checkReadOutput(readExpr, "abc", abc, "Reads an atom.");
+    checkReadOutput(readExpr, "abc", abc, "Reads an atom: \"abc\"");
 
-    checkReadOutput(readExpr, "(a b c)", listABC, "Reads a list.");
+    checkReadOutput(readExpr, "(a b c)", listABC, "Reads a list: \"(a b c)\"");
 
     expr = cons(quoteAtom, cons(a, nil));
-    checkReadOutput(readExpr, "'a", expr, "Reads quote shorthand for an atom.");
+    checkReadOutput(readExpr, "'a", expr, "Reads quote shorthand for an atom: \"'a\"");
 
     expr = cons(quoteAtom, cons(listABC, nil));
-    checkReadOutput(readExpr, "'(a b c)", expr, "Reads quote shorthand for a list.");
+    checkReadOutput(readExpr, "'(a b c)", expr, "Reads quote shorthand for a list: \"'(a b c)\"");
 
-    checkReadOutput(readExpr, "()", nil, "Reads an empty list.");
+    checkReadOutput(readExpr, "()", nil, "Reads an empty list: \"()\"");
 
 }
 
@@ -404,21 +419,21 @@ void testPrintExpr(){
 
     SExpr* expr;
 
-    checkPrintOutput(printExpr, a, "a", "Prints an atom.");
-    checkPrintOutput(printExpr, nil, "()", "Prints NIL.");
+    checkPrintOutput(printExpr, a, "a", "Prints an atom: printExpr(a)");
+    checkPrintOutput(printExpr, nil, "()", "Prints (): printExpr(())");
 
     expr = cons(a, nil);
-    checkPrintOutput(printExpr, expr, "(a)", "Prints a single-element list.");
+    checkPrintOutput(printExpr, expr, "(a)", "Prints a single-element list: printExpr((a))");
 
     expr = cons(a, cons(b, cons(c, nil)));
-    checkPrintOutput(printExpr, expr, "(a b c)", "Prints a list.");
+    checkPrintOutput(printExpr, expr, "(a b c)", "Prints a list: printExpr((a b c))");
 
     SExpr* listAB = cons(a, cons(b, nil));
     expr = cons(listAB, cons(c, nil));
-    checkPrintOutput(printExpr, expr, "((a b) c)", "Prints a nested list.");
+    checkPrintOutput(printExpr, expr, "((a b) c)", "Prints a nested list: printExpr(((a b) c))");
 
     expr = cons(a, b);
-    checkPrintOutput(printExpr, expr, "(a . b)", "Prints a dotted pair.");
+    checkPrintOutput(printExpr, expr, "(a . b)", "Prints a dotted pair: printExpr((a . b))");
 
 }
 
@@ -426,7 +441,7 @@ void testPrintList(){
     cout << "\n-----------------------------------------------------------" << endl;
     cout << "---------------------- TEST PRINT LIST --------------------" << endl;
     cout << "-----------------------------------------------------------" << endl;
-    cout << "📌 Note: printList should print the contents of a list in the correct format without the parentheses." << endl;
+    cout << "📌 Note: printList should print the contents of a list in the correct format without the outer parentheses." << endl;
 
     SExpr* a = makeAtom("a");
     SExpr* b = makeAtom("b");
@@ -436,15 +451,14 @@ void testPrintList(){
     SExpr* expr;
 
     expr = cons(a, cons(b, cons(c, nil)));
-    checkPrintOutput(printList, expr, "a b c", "Prints the contents of a proper list.");
+    checkPrintOutput(printList, expr, "a b c", "Prints the contents of a proper list: printList((a b c))");
 
     expr = cons(a, b);
-    checkPrintOutput(printList, expr, "a . b", "Prints the contents of a dotted pair.");
+    checkPrintOutput(printList, expr, "a . b", "Prints the contents of a dotted pair: printList((a . b))");
 
     SExpr* listAB = cons(a, cons(b, nil));
     expr = cons(listAB, cons(c, nil));
-    checkPrintOutput(printList, expr, "(a b) c", "Prints the contents of a nested list.");
-
+    checkPrintOutput(printList, expr, "(a b) c", "Prints the contents of a nested list: printList(((a b) c))");
 }
 
 void testMakePair(){
@@ -456,12 +470,14 @@ void testMakePair(){
     SExpr* name = makeAtom("a");
     SExpr* value = makeAtom("2");
 
+    cout << "\n🔎 Test: Creates a name-value pair: makePair(a, 2)";
+
     SExpr* pair = makePair(name, value);
 
     check(pair->type == Type::CELL, "Creates a pair with type CELL.", pair->type == Type::CELL ? "CELL" : "NOT CELL", "CELL");
     check(car(pair) == name, "Stores the name as the first element.", exprToString(car(pair)), "a");
     check(car(cdr(pair)) == value, "Stores the value as the second element.", exprToString(car(cdr(pair))), "2");
-    check(isNil(cdr(cdr(pair))), "Ends the pair with NIL.", exprToString(cdr(cdr(pair))), "()");
+    check(isNil(cdr(cdr(pair))), "Ends the pair with ().", exprToString(cdr(cdr(pair))), "()");
 }
 
 void testLookup(){
@@ -485,109 +501,288 @@ void testLookup(){
     rho = cons(makePair(b, four), rho);
 
     result = lookup(a);
-    check(result == two, "Finds the value associated with a symbol.", exprToString(result), "2");
+    check(result == two, "Returns the value associated with a symbol: lookup(a)", exprToString(result), "2");
 
     result = lookup(b);
-    check(result == four, "Finds another value in the environment.", exprToString(result), "4");
+    check(result == four, "Returns another value stored in the environment: lookup(b)", exprToString(result), "4");
 
     result = lookup(x);
-    check(result == x, "Returns an undefined symbol unchanged.", exprToString(result), "x");
+    check(result == x, "Returns an undefined symbol unchanged: lookup(x)", exprToString(result), "x");
 
     rho = cons(makePair(a, ten), rho);
 
     result = lookup(a);
-    check(result == ten, "Returns the most recent value when a symbol is defined again.", exprToString(result), "10");
+    check(result == ten, "Returns the most recent value when a symbol is defined again: lookup(a)", exprToString(result), "10");
 }
 
 void testSet(){
     cout << "\n-----------------------------------------------------------" << endl;
     cout << "------------------------- TEST SET ------------------------" << endl;
     cout << "-----------------------------------------------------------" << endl;
-    cout << "📌 Note: Set should store a value in the environment and return the assigned value." << endl;
-
-    SExpr* a = makeAtom("a");
-    SExpr* two = makeAtom("2");
-    SExpr* ten = makeAtom("10");
-    SExpr* nil = makeNil();
-    SExpr* setAtom = makeAtom("set");
-
-    SExpr* expr;
-    SExpr* result;
+    cout << "📌 Note: set should store a value in the environment and return the assigned value." << endl;
 
     rho = makeNil();
 
-    expr = cons(setAtom, cons(a, cons(two, nil)));
-    result = eval(expr);
-    check(result == two, "Returns the value assigned to a symbol.", exprToString(result), "2");
+    SExpr* result;
 
-    result = eval(a);
-    check(result == two, "Evaluates a defined symbol to its value.", exprToString(result), "2");
+    result = evalString("(set a 2)");
+    check(exprToString(result) == "2", "Returns the value assigned to a symbol: (set a 2)", exprToString(result), "2");
 
-    expr = cons(setAtom, cons(a, cons(ten, nil)));
-    result = eval(expr);
-    check(result == ten, "Returns the new value when a symbol is redefined.", exprToString(result), "10");
+    result = evalString("a");
+    check(exprToString(result) == "2", "Evaluates a defined symbol to its value: eval(a)", exprToString(result), "2");
 
-    check(car(cdr(car(cdr(rho)))) == two, "Keeps the previous definition when a symbol is redefined.", exprToString(car(cdr(car(cdr(rho))))), "2");
+    result = evalString("(set a 10)");
+    check(exprToString(result) == "10", "Returns the new value when a symbol is redefined: (set a 10)", exprToString(result), "10");
 
-    result = eval(a);
-    check(result == ten, "Evaluates a redefined symbol to its most recent value.", exprToString(result), "10");
+    SExpr* previous = car(cdr(car(cdr(rho))));
+    check(exprToString(previous) == "2", "Keeps the previous definition when a symbol is redefined.", exprToString(previous), "2");
+
+    result = evalString("a");
+    check(exprToString(result) == "10", "Evaluates a redefined symbol to its most recent value: eval(a)", exprToString(result), "10");
 }
 
-void testPredicates(){
+void testNil(){
     cout << "\n-----------------------------------------------------------" << endl;
-    cout << "-------------------- TEST PREDICATES ----------------------" << endl;
+    cout << "---------------------- TEST NIL? --------------------------" << endl;
     cout << "-----------------------------------------------------------" << endl;
-    cout << "📌 Note: Predicates should return T when true and NIL when false." << endl;
+    cout << "📌 Note: nil? should return T when its argument is () and () otherwise." << endl;
 
     rho = makeNil();
 
-    SExpr* nil = makeNil();
-    SExpr* a = makeAtom("a");
-    SExpr* number = makeAtom("42");
-    SExpr* list = cons(a, cons(makeAtom("b"), nil));
-
-    SExpr* expr;
     SExpr* result;
 
-    expr = cons(makeAtom("nil?"), cons(nil, nil));
-    result = eval(expr);
-    check(exprToString(result) == "T", "nil? returns true for NIL.", exprToString(result), "T");
+    result = evalString("(nil? ())");
+    check(exprToString(result) == "T", "Returns T when the argument is (): (nil? ())", exprToString(result), "T");
 
-    expr = cons(makeAtom("nil?"), cons(a, nil));
-    result = eval(expr);
-    check(isNil(result), "nil? returns false for an atom.", exprToString(result), "()");
+    result = evalString("(nil? 'a)");
+    check(isNil(result), "Returns () when the argument is not (): (nil? 'a)", exprToString(result), "()");
+}
 
-    expr = cons(makeAtom("atom?"), cons(a, nil));
-    result = eval(expr);
-    check(exprToString(result) == "T", "atom? returns true for an atom.", exprToString(result), "T");
+void testAtom(){
+    cout << "\n-----------------------------------------------------------" << endl;
+    cout << "--------------------- TEST ATOM? --------------------------" << endl;
+    cout << "-----------------------------------------------------------" << endl;
+    cout << "📌 Note: atom? should return T when its argument is an atom and () when its argument is a list." << endl;
 
-    expr = cons(makeAtom("atom?"), cons(list, nil));
-    result = eval(expr);
-    check(isNil(result), "atom? returns false for a list.", exprToString(result), "()");
+    rho = makeNil();
 
-    expr = cons(makeAtom("list?"), cons(list, nil));
-    result = eval(expr);
-    check(exprToString(result) == "T", "list? returns true for a list.", exprToString(result), "T");
+    SExpr* result;
 
-    expr = cons(makeAtom("list?"), cons(a, nil));
-    result = eval(expr);
-    check(isNil(result), "list? returns false for an atom.", exprToString(result), "()");
+    result = evalString("(atom? x)");
+    check(exprToString(result) == "T", "Returns T when the argument is an atom: (atom? x)", exprToString(result), "T");
 
-    expr = cons(makeAtom("not?"), cons(nil, nil));
-    result = eval(expr);
-    check(exprToString(result) == "T", "not? returns true for NIL.", exprToString(result), "T");
+    result = evalString("(atom? (x))");
+    check(isNil(result), "Returns () when the argument is a list: (atom? (x))", exprToString(result), "()");
+}
 
-    expr = cons(makeAtom("not?"), cons(a, nil));
-    result = eval(expr);
-    check(isNil(result), "not? returns false for a non-NIL value.", exprToString(result), "()");
+void testList(){
+    cout << "\n-----------------------------------------------------------" << endl;
+    cout << "--------------------- TEST LIST? --------------------------" << endl;
+    cout << "-----------------------------------------------------------" << endl;
+    cout << "📌 Note: list? should return T when its argument is a list and () when its argument is an atom." << endl;
 
-    expr = cons(makeAtom("number?"), cons(number, nil));
-    result = eval(expr);
-    check(exprToString(result) == "T", "number? returns true for a numeric atom.", exprToString(result), "T");
+    rho = makeNil();
 
-    expr = cons(makeAtom("number?"), cons(a, nil));
-    result = eval(expr);
-    check(isNil(result), "number? returns false for a nonnumeric atom.", exprToString(result), "()");
+    SExpr* result;
+
+    result = evalString("(list? (x))");
+    check(exprToString(result) == "T", "Returns T when the argument is a list: (list? (x))", exprToString(result), "T");
+
+    result = evalString("(list? x)");
+    check(isNil(result), "Returns () when the argument is an atom: (list? x)", exprToString(result), "()");
+}
+
+void testNot(){
+    cout << "\n-----------------------------------------------------------" << endl;
+    cout << "---------------------- TEST NOT? --------------------------" << endl;
+    cout << "-----------------------------------------------------------" << endl;
+    cout << "📌 Note: not? should return T when its argument is () and () otherwise." << endl;
+
+    rho = makeNil();
+
+    SExpr* result;
+
+    result = evalString("(not? ())");
+    check(exprToString(result) == "T", "Returns T when the argument is (): (not? ())", exprToString(result), "T");
+
+    result = evalString("(not? 'a)");
+    check(isNil(result), "Returns () when the argument is not (): (not? 'a)", exprToString(result), "()");
+}
+
+void testNumber(){
+    cout << "\n-----------------------------------------------------------" << endl;
+    cout << "-------------------- TEST NUMBER? -------------------------" << endl;
+    cout << "-----------------------------------------------------------" << endl;
+    cout << "📌 Note: number? should return T when its argument is a numeric atom and () otherwise." << endl;
+
+    rho = makeNil();
+
+    SExpr* result;
+
+    result = evalString("(number? 123)");
+    check(exprToString(result) == "T", "Returns T for a positive integer: (number? 123)", exprToString(result), "T");
+
+    result = evalString("(number? -42)");
+    check(exprToString(result) == "T", "Returns T for a negative integer: (number? -42)", exprToString(result), "T");
+
+    result = evalString("(number? 'abc)");
+    check(isNil(result), "Returns () for letters: (number? 'abc)", exprToString(result), "()");
+
+    result = evalString("(number? '12a)");
+    check(isNil(result), "Returns () for mixed characters: (number? '12a)", exprToString(result), "()");
+
+    result = evalString("(number? '-)");
+    check(isNil(result), "Returns () for a minus sign alone: (number? '-)", exprToString(result), "()");
+
+    result = evalString("(number? ())");
+    check(isNil(result), "Returns () for (): (number? ())", exprToString(result), "()");
+}
+
+void testAnd(){
+    cout << "\n-----------------------------------------------------------" << endl;
+    cout << "------------------------ TEST AND? ------------------------" << endl;
+    cout << "-----------------------------------------------------------" << endl;
+    cout << "📌 Note: and? returns () if either argument is (). Anything other than () is treated as true." << endl;
+
+    rho = makeNil();
+
+    SExpr* result;
+
+    result = evalString("(and? 'T 'T)");
+    check(exprToString(result) == "T", "Returns T when both arguments are T: (and? 'T 'T)", exprToString(result), "T");
+
+    result = evalString("(and? 'T ())");
+    check(isNil(result), "Returns () when the second argument is (): (and? 'T ())", exprToString(result), "()");
+
+    result = evalString("(and? () 'T)");
+    check(isNil(result), "Returns () when the first argument is (): (and? () 'T)", exprToString(result), "()");
+
+    result = evalString("(and? 'T 'a)");
+    check(exprToString(result) == "a", "Treats anything other than () as true: (and? 'T 'a)", exprToString(result), "a");
+
+    result = evalString("(and? () (set x 1))");
+    check(isNil(result), "Returns () when the first argument is (): (and? () (set x 1))", exprToString(result), "()");
+
+    result = evalString("x");
+    check(exprToString(result) == "x", "Does not evaluate the second argument when the first argument is (): eval(x)", exprToString(result), "x");
+}
+
+void testOr(){
+    cout << "\n-----------------------------------------------------------" << endl;
+    cout << "------------------------ TEST OR? -------------------------" << endl;
+    cout << "-----------------------------------------------------------" << endl;
+    cout << "📌 Note: or? returns () only if both arguments are (). Anything other than () is treated as true." << endl;
+
+    rho = makeNil();
+
+    SExpr* result;
+
+    result = evalString("(or? 'T ())");
+    check(exprToString(result) == "T", "Returns T when the first argument is T: (or? 'T ())", exprToString(result), "T");
+
+    result = evalString("(or? () 'T)");
+    check(exprToString(result) == "T", "Returns T when the second argument is T: (or? () 'T)", exprToString(result), "T");
+
+    result = evalString("(or? () ())");
+    check(isNil(result), "Returns () when both arguments are (): (or? () ())", exprToString(result), "()");
+
+    result = evalString("(or? () 'a)");
+    check(exprToString(result) == "a", "Treats anything other than () as true: (or? () 'a)", exprToString(result), "a");
+
+    // The first argument should be evaluated.
+    result = evalString("(or? (set x 1) ())");
+    check(exprToString(result) == "1", "Returns the result of the first argument: (or? (set x 1) ())", exprToString(result), "1");
+
+    result = evalString("x");
+    check(exprToString(result) == "1", "Evaluates the first argument: eval(x)", exprToString(result), "1");
+
+    // The second argument should not be evaluated when the first argument is T.
+    result = evalString("(or? 'T (set y 1))");
+    check(exprToString(result) == "T", "Returns T without evaluating the second argument: (or? 'T (set y 1))", exprToString(result), "T");
+
+    result = evalString("y");
+    check(exprToString(result) == "y", "Does not evaluate the second argument when the first argument is T: eval(y)", exprToString(result), "y");
+}
+
+void testEq(){
+    cout << "\n-----------------------------------------------------------" << endl;
+    cout << "------------------------ TEST EQ? -------------------------" << endl;
+    cout << "-----------------------------------------------------------" << endl;
+    cout << "📌 Note: eq? returns T when two atoms are the same. If the atoms are different or either argument is not an atom, it returns ()." << endl;
+
+    rho = makeNil();
+
+    SExpr* result;
+
+    result = evalString("(eq? 'a 'a)");
+    check(exprToString(result) == "T", "Returns T when both atoms are the same: (eq? 'a 'a)", exprToString(result), "T");
+
+    result = evalString("(eq? 'a 'b)");
+    check(isNil(result), "Returns () when the atoms are different: (eq? 'a 'b)", exprToString(result), "()");
+
+    result = evalString("(eq? () ())");
+    check(isNil(result), "Returns () when the arguments are (): (eq? () ())", exprToString(result), "()");
+
+    result = evalString("(eq? '(a) '(a))");
+    check(isNil(result), "Returns () when the arguments are lists: (eq? '(a) '(a))", exprToString(result), "()");
+
+    result = evalString("(eq? 'a ())");
+    check(isNil(result), "Returns () when only one argument is an atom: (eq? 'a ())", exprToString(result), "()");
+}
+
+void testIf(){
+    cout << "\n-----------------------------------------------------------" << endl;
+    cout << "------------------------- TEST IF -------------------------" << endl;
+    cout << "-----------------------------------------------------------" << endl;
+    cout << "📌 Note: if evaluates the true branch when the condition is anything other than (), and the false branch when the condition is (). Only the chosen branch is evaluated." << endl;
+
+    rho = makeNil();
+
+    SExpr* result;
+
+    result = evalString("(if 'T 'yes 'no)");
+    check(exprToString(result) == "yes", "Returns the true branch when the condition is T: (if 'T 'yes 'no)", exprToString(result), "yes");
+
+    result = evalString("(if () 'yes 'no)");
+    check(exprToString(result) == "no", "Returns the false branch when the condition is (): (if () 'yes 'no)", exprToString(result), "no");
+
+    evalString("(if 'T 'yes (set falseBranch 1))");
+    result = evalString("falseBranch");
+    check(exprToString(result) == "falseBranch", "Does not evaluate the false branch when the condition is T: eval(falseBranch)", exprToString(result), "falseBranch");
+
+    evalString("(if () (set trueBranch 1) 'no)");
+    result = evalString("trueBranch");
+    check(exprToString(result) == "trueBranch", "Does not evaluate the true branch when the condition is (): eval(trueBranch)", exprToString(result), "trueBranch");
+
+    result = evalString("(if 'a 'yes 'no)");
+    check(exprToString(result) == "yes", "Treats anything other than () as true: (if 'a 'yes 'no)", exprToString(result), "yes");
+}
+
+void testCond(){
+    cout << "\n-----------------------------------------------------------" << endl;
+    cout << "------------------------ TEST COND ------------------------" << endl;
+    cout << "-----------------------------------------------------------" << endl;
+    cout << "📌 Note: cond evaluates conditions in order and returns the result associated with the first condition that is not ()." << endl;
+
+    rho = makeNil();
+
+    SExpr* result;
+
+    result = evalString("(cond ('T 'first () 'second))");
+    check(exprToString(result) == "first", "Returns the result of the first true condition: (cond ('T 'first () 'second))", exprToString(result), "first");
+
+    result = evalString("(cond (() 'first 'T 'second))");
+    check(exprToString(result) == "second", "Continues to the next condition when a condition is (): (cond (() 'first 'T 'second))", exprToString(result), "second");
+
+    evalString("(cond ('T 'first 'T (set laterBranch 1)))");
+
+    result = evalString("laterBranch");
+    check(exprToString(result) == "laterBranch", "Does not evaluate later results after finding a true condition: eval(laterBranch)", exprToString(result), "laterBranch");
+
+    evalString("(cond ((set conditionRan 1) 'first 'T 'second))");
+
+    result = evalString("conditionRan");
+    check(exprToString(result) == "1", "Evaluates the condition: eval(conditionRan)", exprToString(result), "1");
 }
 
 void testEval(){
@@ -617,42 +812,42 @@ void testEval(){
 
     expr = a;
     result = eval(expr);
-    check(result == a, "Returns an undefined atom unchanged.", exprToString(result), "a");
+    check(result == a, "Returns an undefined atom unchanged: eval(a)", exprToString(result), "a");
 
     expr = nil;
     result = eval(expr);
-    check(result == nil, "Returns NIL unchanged.", exprToString(result), "()");
+    check(result == nil, "Returns NIL unchanged: eval(())", exprToString(result), "()");
 
     expr = cons(carAtom, cons(listABC, nil));
     result = eval(expr);
-    check(result == a, "Evaluates a simple car expression.", exprToString(result), "a");
+    check(result == a, "Evaluates car with a list argument: eval((car (a b c)))", exprToString(result), "a");
 
     expr = cons(cdrAtom, cons(listABC, nil));
     result = eval(expr);
-    check(result == listBC, "Evaluates a simple cdr expression.", exprToString(result), "(b c)");
+    check(result == listBC, "Evaluates cdr with a list argument: eval((cdr (a b c)))", exprToString(result), "(b c)");
 
     expr = cons(consAtom, cons(a, cons(b, nil)));
     result = eval(expr);
     check(result->type == Type::CELL && result->car == a && result->cdr == b,
-          "Evaluates a simple cons expression.", exprToString(result), "(a . b)");
+          "Evaluates cons with atom arguments: eval((cons a b))", exprToString(result), "(a . b)");
 
     expr = cons(quoteAtom, cons(a, nil));
     result = eval(expr);
-    check(result == a, "Evaluates a simple quote expression.", exprToString(result), "a");
+    check(result == a, "Evaluates quote without evaluating its argument: eval((quote a))", exprToString(result), "a");
 
     expr = cons(evalAtom, cons(a, nil));
     result = eval(expr);
-    check(result == a, "Evaluates a simple eval expression.", exprToString(result), "a");
+    check(result == a, "Evaluates an eval expression: eval((eval a))", exprToString(result), "a");
 
     SExpr* quoteListABC = cons(quoteAtom, cons(listABC, nil));
 
     expr = cons(carAtom, cons(quoteListABC, nil));
     result = eval(expr);
-    check(result == a, "Evaluates car with a quoted list.", exprToString(result), "a");
+    check(result == a, "Evaluates car with a quoted list: eval((car (quote (a b c))))", exprToString(result), "a");
 
     expr = cons(cdrAtom, cons(quoteListABC, nil));
     result = eval(expr);
-    check(result == listBC, "Evaluates cdr with a quoted list.", exprToString(result), "(b c)");
+    check(result == listBC, "Evaluates cdr with a quoted list: eval((cdr (quote (a b c))))", exprToString(result), "(b c)");
 
     SExpr* quoteA = cons(quoteAtom, cons(a, nil));
     SExpr* quoteListBC = cons(quoteAtom, cons(listBC, nil));
@@ -660,11 +855,11 @@ void testEval(){
     expr = cons(consAtom, cons(quoteA, cons(quoteListBC, nil)));
     result = eval(expr);
     check(result->type == Type::CELL && result->car == a && result->cdr == listBC,
-          "Evaluates cons with quoted arguments.", exprToString(result), "(a b c)");
+          "Evaluates cons with quoted arguments: eval((cons (quote a) (quote (b c))))", exprToString(result), "(a b c)");
 
     expr = cons(evalAtom, cons(cons(carAtom, cons(listABC, nil)), nil));
     result = eval(expr);
-    check(result == a, "Evaluates the result of another expression.", exprToString(result), "a");
+    check(result == a, "Evaluates the result of another expression: eval((eval (car (a b c))))", exprToString(result), "a");
 }
 
 
@@ -692,7 +887,18 @@ int main() {
     testMakePair();
     testLookup();
     testSet();
-    testPredicates();
+    
+    testNil();
+    testAtom();
+    testList();
+    testNot();
+    testNumber();
+    
+    testAnd();
+    testOr();
+    testEq();
+    testIf();
+    testCond();
 
     testEval();
 

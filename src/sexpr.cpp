@@ -307,6 +307,72 @@ SExpr* eval(SExpr* expr){
 
             return makeNil();
         }
+        else if (symbol == "and?"){
+            SExpr* argument1 = car(cdr(expr));
+            SExpr* argument2 = car(cdr(cdr(expr)));
+
+            SExpr* evaluatedArgument1 = eval(argument1);
+
+            if (isNil(evaluatedArgument1)){
+                return makeNil();
+            }
+
+            return eval(argument2);
+        }
+        else if (symbol == "or?"){
+            SExpr* argument1 = car(cdr(expr));
+            SExpr* argument2 = car(cdr(cdr(expr)));
+            SExpr* evaluatedArgument1 = eval(argument1);
+
+            if (!isNil(evaluatedArgument1)){
+                return evaluatedArgument1;
+            }
+
+            return eval(argument2);
+        }
+        else if (symbol == "eq?"){
+            SExpr* argument1 = eval(car(cdr(expr)));
+            SExpr* argument2 = eval(car(cdr(cdr(expr))));
+
+            if (!isAtom(argument1) || !isAtom(argument2)){
+                return makeNil();
+            }
+
+            if (argument1->atom == argument2->atom){
+                return makeAtom("T");
+            }
+
+            return makeNil();
+        }
+        else if (symbol == "if"){
+            SExpr* condition = car(cdr(expr));
+            SExpr* trueBranch = car(cdr(cdr(expr)));
+            SExpr* falseBranch = car(cdr(cdr(cdr(expr))));
+
+            SExpr* evaluatedCondition = eval(condition);
+
+            if (isNil(evaluatedCondition)){
+                return eval(falseBranch);
+            }
+
+            return eval(trueBranch);
+        }
+        else if (symbol == "cond"){
+            SExpr* conditions = car(cdr(expr));
+
+            while (!isNil(conditions)){
+                SExpr* condition = car(conditions);
+                SExpr* result = car(cdr(conditions));
+
+                if (!isNil(eval(condition))){
+                    return eval(result);
+                }
+
+                conditions = cdr(cdr(conditions));
+            }
+
+            return makeNil();
+        }
         else if (symbol == "car"){
             SExpr* argument = car(cdr(expr));
             SExpr* evaluatedArgument = eval(argument);

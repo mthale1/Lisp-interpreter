@@ -2,16 +2,18 @@
 
 **Name:** Makenzie Hale  
 **Programming Language:** C++  
-**Current Version:** 1.3  
+**Current Version:** 1.4
 
 ## Project Summary
-This project implements a basic S-expression interpreter in C++. 
+This project implements a basic S-expression interpreter in C++.
 
 The interpreter can read, evaluate, and print S-expressions. It supports `car`, `cdr`, `cons`, `quote`, and `eval`, along with the single-quote (`'`) shorthand for quoted expressions.
 
-Version 1.3 adds a global environment for storing and looking up symbols. Values can be assigned using `set`, and redefining a symbol adds a new definition to the environment while lookup returns the most recent value.
+The interpreter includes a global environment for storing and looking up symbols. Values can be assigned using `set`, and redefining a symbol adds a new definition to the environment while lookup returns the most recent value.
 
-The interpreter also supports the predicates `nil?`, `atom?`, and `list?`, along with the optional predicates `not?` and `number?`.
+The interpreter also supports the predicates `nil?`, `atom?`, `list?`, `not?`, and `number?`.
+
+Version 1.4 adds `and?`, `or?`, and `eq?`, as well as `if` and `cond` for handling conditional expressions.
 
 
 ## Build Instructions
