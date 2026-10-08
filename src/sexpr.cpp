@@ -168,11 +168,11 @@ SExpr* readExpr(){
     else if (cin.peek() == '\'') {
         cin.get();
         
-        SExpr* quotedExpr = readExpr();
-        SExpr* quoteAtom = makeAtom("quote");
-        SExpr* quotedList= cons(quotedExpr, makeNil());
+        SExpr* expr = readExpr();
+        SExpr* atom = makeAtom("quote");
+        SExpr* list= cons(expr, makeNil());
 
-        return cons(quoteAtom, quotedList);
+        return cons(atom, list);
     }
     else {
         return readAtom();
@@ -261,17 +261,17 @@ SExpr* eval(SExpr* expr){
             SExpr* name = car(cdr(expr));
             SExpr* value = car(cdr(cdr(expr)));
 
-            SExpr* evaluatedValue = eval(value);
+            SExpr* evaluated = eval(value);
 
-            rho = cons(makePair(name, evaluatedValue), rho);
+            rho = cons(makePair(name, evaluated), rho);
 
-            return evaluatedValue;
+            return evaluated;
         }
         else if (symbol == "nil?" || symbol == "not?"){
             SExpr* argument = car(cdr(expr));
-            SExpr* evaluatedArgument = eval(argument);
+            SExpr* evaluated = eval(argument);
 
-            if (isNil(evaluatedArgument)){
+            if (isNil(evaluated)){
                 return makeAtom("T");
             }
 
@@ -279,9 +279,9 @@ SExpr* eval(SExpr* expr){
         }
         else if (symbol == "atom?"){
             SExpr* argument = car(cdr(expr));
-            SExpr* evaluatedArgument = eval(argument);
+            SExpr* evaluated = eval(argument);
 
-            if (isAtom(evaluatedArgument)){
+            if (isAtom(evaluated)){
                 return makeAtom("T");
             }
 
@@ -289,9 +289,9 @@ SExpr* eval(SExpr* expr){
         }
         else if (symbol == "list?"){
             SExpr* argument = car(cdr(expr));
-            SExpr* evaluatedArgument = eval(argument);
+            SExpr* evaluated = eval(argument);
 
-            if (evaluatedArgument->type == Type::CELL){
+            if (evaluated->type == Type::CELL){
                 return makeAtom("T");
             }
 
@@ -299,9 +299,9 @@ SExpr* eval(SExpr* expr){
         }
         else if (symbol == "number?"){
             SExpr* argument = car(cdr(expr));
-            SExpr* evaluatedArgument = eval(argument);
+            SExpr* evaluated = eval(argument);
 
-            if (isNumber(evaluatedArgument)){
+            if (isNumber(evaluated)){
                 return makeAtom("T");
             }
 
@@ -322,10 +322,10 @@ SExpr* eval(SExpr* expr){
         else if (symbol == "or?"){
             SExpr* argument1 = car(cdr(expr));
             SExpr* argument2 = car(cdr(cdr(expr)));
-            SExpr* evaluatedArgument1 = eval(argument1);
+            SExpr* evaluatedArg1 = eval(argument1);
 
-            if (!isNil(evaluatedArgument1)){
-                return evaluatedArgument1;
+            if (!isNil(evaluatedArg1)){
+                return evaluatedArg1;
             }
 
             return eval(argument2);
@@ -349,9 +349,9 @@ SExpr* eval(SExpr* expr){
             SExpr* trueBranch = car(cdr(cdr(expr)));
             SExpr* falseBranch = car(cdr(cdr(cdr(expr))));
 
-            SExpr* evaluatedCondition = eval(condition);
+            SExpr* evaluated = eval(condition);
 
-            if (isNil(evaluatedCondition)){
+            if (isNil(evaluated)){
                 return eval(falseBranch);
             }
 
@@ -375,15 +375,15 @@ SExpr* eval(SExpr* expr){
         }
         else if (symbol == "car"){
             SExpr* argument = car(cdr(expr));
-            SExpr* evaluatedArgument = eval(argument);
+            SExpr* evaluated = eval(argument);
 
-            return car(evaluatedArgument);
+            return car(evaluated);
         }
         else if (symbol == "cdr"){
             SExpr* argument = car(cdr(expr));
-            SExpr* evaluatedArgument = eval(argument);
+            SExpr* evaluated = eval(argument);
 
-            return cdr(evaluatedArgument);
+            return cdr(evaluated);
         }
         else if (symbol == "cons"){
             SExpr* argument1 = car(cdr(expr));
@@ -400,9 +400,9 @@ SExpr* eval(SExpr* expr){
         }
         else if (symbol == "eval"){
             SExpr* argument = car(cdr(expr));
-            SExpr* evaluatedArgument = eval(argument);
+            SExpr* evaluated = eval(argument);
 
-            return eval(evaluatedArgument);
+            return eval(evaluated);
         }
     }
     
