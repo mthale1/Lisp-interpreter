@@ -99,3 +99,28 @@ w
 
 (cond ('T 'first 'T (set q 1)))
 q
+
+(add 2 3)
+(add -5 3)
+(add (add 2 3) 4)
+
+(sub 10 3)
+(sub 3 10)
+(sub (add 2 3) 1)
+
+(mul 4 5)
+(mul -3 4)
+(mul (add 2 3) (sub 6 2))
+
+(div 10 2)
+(div 7 2)
+(div (mul 3 4) (add 1 2))
+
+(rem 10 3)
+(rem 8 4)
+(rem (add 5 5) 4)
+
+(lt 2 5)
+(lt 5 2)
+(lt 5 5)
+(lt (sub 5 3) (add 2 3))

@@ -498,6 +498,84 @@
 ✅ PASS 	Evaluates the condition: eval(conditionRan) | Actual: 1 | Expected: 1
 
 -----------------------------------------------------------
+------------------------ TEST ADD -------------------------
+-----------------------------------------------------------
+📌 Note: add should return the sum of two numeric arguments.
+
+✅ PASS 	Adds two positive integers: (add 2 3) | Actual: 5 | Expected: 5
+
+✅ PASS 	Adds a negative and positive integer: (add -5 3) | Actual: -2 | Expected: -2
+
+✅ PASS 	Adds zero: (add 0 5) | Actual: 5 | Expected: 5
+
+✅ PASS 	Evaluates an argument before adding: (add (add 2 3) 4) | Actual: 9 | Expected: 9
+
+-----------------------------------------------------------
+------------------------ TEST SUB -------------------------
+-----------------------------------------------------------
+📌 Note: sub should return the difference of two numeric arguments.
+
+✅ PASS 	Subtracts two positive integers: (sub 10 3) | Actual: 7 | Expected: 7
+
+✅ PASS 	Returns a negative result when the second argument is larger: (sub 3 10) | Actual: -7 | Expected: -7
+
+✅ PASS 	Subtracts zero: (sub 5 0) | Actual: 5 | Expected: 5
+
+✅ PASS 	Evaluates an argument before subtracting: (sub (add 2 3) 1) | Actual: 4 | Expected: 4
+
+-----------------------------------------------------------
+------------------------ TEST MUL -------------------------
+-----------------------------------------------------------
+📌 Note: mul should return the product of two numeric arguments.
+
+✅ PASS 	Multiplies two positive integers: (mul 4 5) | Actual: 20 | Expected: 20
+
+✅ PASS 	Multiplies a negative and positive integer: (mul -3 4) | Actual: -12 | Expected: -12
+
+✅ PASS 	Multiplies by zero: (mul 5 0) | Actual: 0 | Expected: 0
+
+✅ PASS 	Evaluates both arguments before multiplying: (mul (add 2 3) (sub 6 2)) | Actual: 20 | Expected: 20
+
+-----------------------------------------------------------
+------------------------ TEST DIV -------------------------
+-----------------------------------------------------------
+📌 Note: div should return the integer quotient of two numeric arguments.
+
+✅ PASS 	Divides two positive integers: (div 10 2) | Actual: 5 | Expected: 5
+
+✅ PASS 	Uses integer division: (div 7 2) | Actual: 3 | Expected: 3
+
+✅ PASS 	Divides a negative integer by a positive integer: (div -12 3) | Actual: -4 | Expected: -4
+
+✅ PASS 	Evaluates both arguments before dividing: (div (mul 3 4) (add 1 2)) | Actual: 4 | Expected: 4
+
+-----------------------------------------------------------
+------------------------ TEST REM -------------------------
+-----------------------------------------------------------
+📌 Note: rem should return the remainder after dividing two numeric arguments.
+
+✅ PASS 	Returns the remainder: (rem 10 3) | Actual: 1 | Expected: 1
+
+✅ PASS 	Returns zero when there is no remainder: (rem 8 4) | Actual: 0 | Expected: 0
+
+✅ PASS 	Returns the remainder when dividing by two: (rem 7 2) | Actual: 1 | Expected: 1
+
+✅ PASS 	Evaluates an argument before finding the remainder: (rem (add 5 5) 4) | Actual: 2 | Expected: 2
+
+-----------------------------------------------------------
+------------------------- TEST LT -------------------------
+-----------------------------------------------------------
+📌 Note: lt should return T when the first numeric argument is less than the second and () otherwise.
+
+✅ PASS 	Returns T when the first argument is less than the second: (lt 2 5) | Actual: T | Expected: T
+
+✅ PASS 	Returns () when the first argument is greater than the second: (lt 5 2) | Actual: () | Expected: ()
+
+✅ PASS 	Returns () when the arguments are equal: (lt 5 5) | Actual: () | Expected: ()
+
+✅ PASS 	Evaluates both arguments before comparing: (lt (sub 5 3) (add 2 3)) | Actual: T | Expected: T
+
+-----------------------------------------------------------
 ------------------------- TEST EVAL -----------------------
 -----------------------------------------------------------
 📌 Note: Eval should correctly evaluate supported S-expressions and operations.
@@ -523,3 +601,10 @@
 ✅ PASS 	Evaluates cons with quoted arguments: eval((cons (quote a) (quote (b c)))) | Actual: (a b c) | Expected: (a b c)
 
 ✅ PASS 	Evaluates the result of another expression: eval((eval (car (a b c)))) | Actual: a | Expected: a
+
+===========================================================
+                        TEST REPORT                        
+===========================================================
+✅ Passed: 181
+❌ Failed: 0
+Total:  181

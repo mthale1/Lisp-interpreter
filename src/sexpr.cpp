@@ -257,6 +257,7 @@ SExpr* eval(SExpr* expr){
     if (isAtom(car(expr))) {
         string symbol = car(expr)->atom;
 
+        // SET
         if (symbol == "set") {
             SExpr* name = car(cdr(expr));
             SExpr* value = car(cdr(cdr(expr)));
@@ -267,6 +268,7 @@ SExpr* eval(SExpr* expr){
 
             return evaluated;
         }
+        // PREDICATES
         else if (symbol == "nil?" || symbol == "not?"){
             SExpr* argument = car(cdr(expr));
             SExpr* evaluated = eval(argument);
@@ -307,6 +309,7 @@ SExpr* eval(SExpr* expr){
 
             return makeNil();
         }
+        // BOOLEANS
         else if (symbol == "and?"){
             SExpr* argument1 = car(cdr(expr));
             SExpr* argument2 = car(cdr(cdr(expr)));
@@ -344,6 +347,7 @@ SExpr* eval(SExpr* expr){
 
             return makeNil();
         }
+        // CONDITIONALS
         else if (symbol == "if"){
             SExpr* condition = car(cdr(expr));
             SExpr* trueBranch = car(cdr(cdr(expr)));
@@ -373,6 +377,7 @@ SExpr* eval(SExpr* expr){
 
             return makeNil();
         }
+        // LIST OPERATIONS
         else if (symbol == "car"){
             SExpr* argument = car(cdr(expr));
             SExpr* evaluated = eval(argument);
@@ -394,6 +399,66 @@ SExpr* eval(SExpr* expr){
 
             return cons(evaluatedArgument1, evaluatedArgument2);
         }
+        // MATH
+        else if (symbol == "add"){
+            SExpr* argument1 = eval(car(cdr(expr)));
+            SExpr* argument2 = eval(car(cdr(cdr(expr))));
+
+            int value1 = symbolToInt(argument1);
+            int value2 = symbolToInt(argument2);
+
+            return intToSymbol(value1 + value2);
+        }
+        else if (symbol == "sub"){
+            SExpr* argument1 = eval(car(cdr(expr)));
+            SExpr* argument2 = eval(car(cdr(cdr(expr))));
+
+            int value1 = symbolToInt(argument1);
+            int value2 = symbolToInt(argument2);
+
+            return intToSymbol(value1 - value2);
+        }
+        else if (symbol == "mul"){
+            SExpr* argument1 = eval(car(cdr(expr)));
+            SExpr* argument2 = eval(car(cdr(cdr(expr))));
+
+            int value1 = symbolToInt(argument1);
+            int value2 = symbolToInt(argument2);
+
+            return intToSymbol(value1 * value2);
+        }
+        else if (symbol == "div"){
+            SExpr* argument1 = eval(car(cdr(expr)));
+            SExpr* argument2 = eval(car(cdr(cdr(expr))));
+
+            int value1 = symbolToInt(argument1);
+            int value2 = symbolToInt(argument2);
+
+            return intToSymbol(value1 / value2);
+        }
+        else if (symbol == "rem"){
+            SExpr* argument1 = eval(car(cdr(expr)));
+            SExpr* argument2 = eval(car(cdr(cdr(expr))));
+
+            int value1 = symbolToInt(argument1);
+            int value2 = symbolToInt(argument2);
+
+            return intToSymbol(value1 % value2);
+        }
+        else if (symbol == "lt"){
+            SExpr* argument1 = eval(car(cdr(expr)));
+            SExpr* argument2 = eval(car(cdr(cdr(expr))));
+
+            int value1 = symbolToInt(argument1);
+            int value2 = symbolToInt(argument2);
+
+            if (value1 < value2){
+                return makeAtom("T");
+            }
+
+            return makeNil();
+        }
+        // QUOTE & EVAL
         else if (symbol == "quote"){
             SExpr* argument = car(cdr(expr));
             return quote(argument);

@@ -2,7 +2,7 @@
 
 **Name:** Makenzie Hale  
 **Programming Language:** C++  
-**Current Version:** 1.4
+**Current Version:** 1.5
 
 ## Project Summary
 This project implements a basic S-expression interpreter in C++.
@@ -11,9 +11,9 @@ The interpreter can read, evaluate, and print S-expressions. It supports `car`, 
 
 The interpreter includes a global environment for storing and looking up symbols. Values can be assigned using `set`, and redefining a symbol adds a new definition to the environment while lookup returns the most recent value.
 
-The interpreter also supports the predicates `nil?`, `atom?`, `list?`, `not?`, and `number?`.
+The interpreter supports the predicates `nil?`, `atom?`, `list?`, `not?`, and `number?`. It also supports `and?`, `or?`, and `eq?`, along with `if` and `cond` for handling conditional expressions.
 
-Version 1.4 adds `and?`, `or?`, and `eq?`, as well as `if` and `cond` for handling conditional expressions.
+Version 1.5 adds math operations `add`, `sub`, `mul`, `div`, and `rem`, along with `lt` for comparing two numeric arguments. Division uses integer division.
 
 
 ## Build Instructions
@@ -66,7 +66,7 @@ Run the unit tests and save the output:
 
 All testing files can be found in the `tests/` directory.
 
-`unit_test_sexpr.cpp` - contains unit tests for the individual interpreter functions and reports PASS or FAIL for each test case.
+`unit_test_sexpr.cpp` - contains unit tests for the individual interpreter functions, reports PASS or FAIL for each test case, and provides a test report with the total number of passed and failed tests.
 
 `unit_test_output.txt` - contains the saved output from the unit tests.
 

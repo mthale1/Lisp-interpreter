@@ -3,17 +3,24 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-
+#include <vector>
 using namespace std;
+
+int testsPassed = 0;
+int testsFailed = 0;
+vector<string> failedTests;
 
 // Unit test helper functions
 void check(bool condition, string test, string actual, string expected){
 
     if (condition){
         cout << "\n✅ PASS \t";
+        testsPassed++;
     }
     else {
         cout << "\n❌ FAIL \t";
+        testsFailed++;
+        failedTests.push_back(test);
     }
 
     cout << test << " | Actual: " << actual << " | Expected: " << expected << endl;
@@ -785,6 +792,144 @@ void testCond(){
     check(exprToString(result) == "1", "Evaluates the condition: eval(conditionRan)", exprToString(result), "1");
 }
 
+void testAdd(){
+    cout << "\n-----------------------------------------------------------" << endl;
+    cout << "------------------------ TEST ADD -------------------------" << endl;
+    cout << "-----------------------------------------------------------" << endl;
+    cout << "📌 Note: add should return the sum of two numeric arguments." << endl;
+
+    rho = makeNil();
+
+    SExpr* result;
+
+    result = evalString("(add 2 3)");
+    check(exprToString(result) == "5", "Adds two positive integers: (add 2 3)", exprToString(result), "5");
+
+    result = evalString("(add -5 3)");
+    check(exprToString(result) == "-2", "Adds a negative and positive integer: (add -5 3)", exprToString(result), "-2");
+
+    result = evalString("(add 0 5)");
+    check(exprToString(result) == "5", "Adds zero: (add 0 5)", exprToString(result), "5");
+
+    result = evalString("(add (add 2 3) 4)");
+    check(exprToString(result) == "9", "Evaluates an argument before adding: (add (add 2 3) 4)", exprToString(result), "9");
+}
+
+void testSub(){
+    cout << "\n-----------------------------------------------------------" << endl;
+    cout << "------------------------ TEST SUB -------------------------" << endl;
+    cout << "-----------------------------------------------------------" << endl;
+    cout << "📌 Note: sub should return the difference of two numeric arguments." << endl;
+
+    rho = makeNil();
+
+    SExpr* result;
+
+    result = evalString("(sub 10 3)");
+    check(exprToString(result) == "7", "Subtracts two positive integers: (sub 10 3)", exprToString(result), "7");
+
+    result = evalString("(sub 3 10)");
+    check(exprToString(result) == "-7", "Returns a negative result when the second argument is larger: (sub 3 10)", exprToString(result), "-7");
+
+    result = evalString("(sub 5 0)");
+    check(exprToString(result) == "5", "Subtracts zero: (sub 5 0)", exprToString(result), "5");
+
+    result = evalString("(sub (add 2 3) 1)");
+    check(exprToString(result) == "4", "Evaluates an argument before subtracting: (sub (add 2 3) 1)", exprToString(result), "4");
+}
+
+void testMul(){
+    cout << "\n-----------------------------------------------------------" << endl;
+    cout << "------------------------ TEST MUL -------------------------" << endl;
+    cout << "-----------------------------------------------------------" << endl;
+    cout << "📌 Note: mul should return the product of two numeric arguments." << endl;
+
+    rho = makeNil();
+
+    SExpr* result;
+
+    result = evalString("(mul 4 5)");
+    check(exprToString(result) == "20", "Multiplies two positive integers: (mul 4 5)", exprToString(result), "20");
+
+    result = evalString("(mul -3 4)");
+    check(exprToString(result) == "-12", "Multiplies a negative and positive integer: (mul -3 4)", exprToString(result), "-12");
+
+    result = evalString("(mul 5 0)");
+    check(exprToString(result) == "0", "Multiplies by zero: (mul 5 0)", exprToString(result), "0");
+
+    result = evalString("(mul (add 2 3) (sub 6 2))");
+    check(exprToString(result) == "20", "Evaluates both arguments before multiplying: (mul (add 2 3) (sub 6 2))", exprToString(result), "20");
+}
+
+void testDiv(){
+    cout << "\n-----------------------------------------------------------" << endl;
+    cout << "------------------------ TEST DIV -------------------------" << endl;
+    cout << "-----------------------------------------------------------" << endl;
+    cout << "📌 Note: div should return the integer quotient of two numeric arguments." << endl;
+
+    rho = makeNil();
+
+    SExpr* result;
+
+    result = evalString("(div 10 2)");
+    check(exprToString(result) == "5", "Divides two positive integers: (div 10 2)", exprToString(result), "5");
+
+    result = evalString("(div 7 2)");
+    check(exprToString(result) == "3", "Uses integer division: (div 7 2)", exprToString(result), "3");
+
+    result = evalString("(div -12 3)");
+    check(exprToString(result) == "-4", "Divides a negative integer by a positive integer: (div -12 3)", exprToString(result), "-4");
+
+    result = evalString("(div (mul 3 4) (add 1 2))");
+    check(exprToString(result) == "4", "Evaluates both arguments before dividing: (div (mul 3 4) (add 1 2))", exprToString(result), "4");
+}
+
+void testRem(){
+    cout << "\n-----------------------------------------------------------" << endl;
+    cout << "------------------------ TEST REM -------------------------" << endl;
+    cout << "-----------------------------------------------------------" << endl;
+    cout << "📌 Note: rem should return the remainder after dividing two numeric arguments." << endl;
+
+    rho = makeNil();
+
+    SExpr* result;
+
+    result = evalString("(rem 10 3)");
+    check(exprToString(result) == "1", "Returns the remainder: (rem 10 3)", exprToString(result), "1");
+
+    result = evalString("(rem 8 4)");
+    check(exprToString(result) == "0", "Returns zero when there is no remainder: (rem 8 4)", exprToString(result), "0");
+
+    result = evalString("(rem 7 2)");
+    check(exprToString(result) == "1", "Returns the remainder when dividing by two: (rem 7 2)", exprToString(result), "1");
+
+    result = evalString("(rem (add 5 5) 4)");
+    check(exprToString(result) == "2", "Evaluates an argument before finding the remainder: (rem (add 5 5) 4)", exprToString(result), "2");
+}
+
+void testLt(){
+    cout << "\n-----------------------------------------------------------" << endl;
+    cout << "------------------------- TEST LT -------------------------" << endl;
+    cout << "-----------------------------------------------------------" << endl;
+    cout << "📌 Note: lt should return T when the first numeric argument is less than the second and () otherwise." << endl;
+
+    rho = makeNil();
+
+    SExpr* result;
+
+    result = evalString("(lt 2 5)");
+    check(exprToString(result) == "T", "Returns T when the first argument is less than the second: (lt 2 5)", exprToString(result), "T");
+
+    result = evalString("(lt 5 2)");
+    check(isNil(result), "Returns () when the first argument is greater than the second: (lt 5 2)", exprToString(result), "()");
+
+    result = evalString("(lt 5 5)");
+    check(isNil(result), "Returns () when the arguments are equal: (lt 5 5)", exprToString(result), "()");
+
+    result = evalString("(lt (sub 5 3) (add 2 3))");
+    check(exprToString(result) == "T", "Evaluates both arguments before comparing: (lt (sub 5 3) (add 2 3))", exprToString(result), "T");
+}
+
 void testEval(){
     cout << "\n-----------------------------------------------------------" << endl;
     cout << "------------------------- TEST EVAL -----------------------" << endl;
@@ -862,6 +1007,22 @@ void testEval(){
     check(result == a, "Evaluates the result of another expression: eval((eval (car (a b c))))", exprToString(result), "a");
 }
 
+void testReport(){
+    cout << "\n===========================================================" << endl;
+    cout << "                        TEST REPORT                        " << endl;
+    cout << "===========================================================" << endl;
+    cout << "✅ Passed: " << testsPassed << endl;
+    cout << "❌ Failed: " << testsFailed << endl;
+    cout << "Total:  " << testsPassed + testsFailed << endl;
+
+    if (testsFailed > 0){
+    cout << "\nFailed Tests:" << endl;
+
+    for (string test : failedTests){
+        cout << "- " << test << endl;
+    }
+    }
+}
 
 int main() {
     testMakeAtom();
@@ -881,6 +1042,7 @@ int main() {
     testReadAtom();
     testReadList();
     testReadExpr();
+    
     testPrintExpr();
     testPrintList();
 
@@ -900,7 +1062,16 @@ int main() {
     testIf();
     testCond();
 
+    testAdd();
+    testSub();
+    testMul();
+    testDiv();
+    testRem();
+    testLt();
+
     testEval();
+
+    testReport();
 
     return 0;
 }
