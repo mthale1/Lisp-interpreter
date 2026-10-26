@@ -101,5 +101,18 @@ T
 (function (a b) (add a b))
 (function () 5)
 (function () 5)
+5
 (function (a b) (add a b))
 (function (a b) (add a b))
+5
+9
+(function (x) (foo x 5))
+(function (x) (foo x 5))
+8
+100
+5
+10
+(function (x) (add x n))
+15
+12
+12

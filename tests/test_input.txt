@@ -94,6 +94,7 @@ y
 
 (if 'T 'yes (set z 1))
 z
+
 (if () (set w 1) 'no)
 w
 
@@ -129,8 +130,25 @@ q
 (function (a) a)
 (function (a b) (add a b))
 
-(set foo (function () 5))
-foo
+(set noArgs (function () 5))
+noArgs
+(noArgs)
 
 (set foo (function (a b) (add a b)))
 foo
+(foo 2 3)
+(foo (add 1 2) (mul 2 3))
+
+(set bar (function (x) (foo x 5)))
+bar
+(bar 3)
+
+(set a 100)
+(foo 2 3)
+
+(set n 10)
+(set foo (function (x) (add x n)))
+(foo 5)
+
+(set result (foo 2 3))
+result

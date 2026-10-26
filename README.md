@@ -2,16 +2,16 @@
 
 **Name:** Makenzie Hale  
 **Programming Language:** C++  
-**Current Version:** 1.6
+**Current Version:** 1.7
 
 ## Project Summary
 This project implements a basic S-expression interpreter in C++. It can read, evaluate, and print S-expressions and supports list operations, predicates, Boolean operations,
 conditionals, math operations, and storing values using `set`.
 
-The interpreter maintains global and local environments for storing and looking up symbols and their values.
+The interpreter maintains global and local environments for storing and looking up symbols and their values. It also supports function expressions, which can be stored using `set`.
 
-Version 1.6 adds a local environment stack and function expressions. Lookup now searches the current local environment before searching the global environment. Function
-expressions evaluate to themselves and can be stored using `set` for later use.
+Version 1.7 adds support for calling the user-defines functions by evaluating their arguments in a local environment. Local environments are pushed onto a stack during function calls 
+and removed when the function returns, allowing functions to call other user-defined functions.
 
 
 ## Build Instructions

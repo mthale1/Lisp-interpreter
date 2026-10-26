@@ -584,15 +584,30 @@
 -----------------------------------------------------------
 ---------------------- TEST FUNCTION ----------------------
 -----------------------------------------------------------
-📌 Note: Function expressions should evaluate to themselves and can be stored using set.
+📌 Note: Function expressions should evaluate to themselves.
 
-✅ PASS 	Returns a function expression unchanged | Actual: (function (a b) (add a b)) | Expected: (function (a b) (add a b))
+✅ PASS 	Returns a function expression unchanged: (function (a b) (add a b)) | Actual: (function (a b) (add a b)) | Expected: (function (a b) (add a b))
 
-✅ PASS 	Returns a function with no arguments unchanged | Actual: (function () 5) | Expected: (function () 5)
+✅ PASS 	Returns a function with no arguments unchanged: (function () 5) | Actual: (function () 5) | Expected: (function () 5)
 
-✅ PASS 	Returns a function with one argument unchanged | Actual: (function (a) a) | Expected: (function (a) a)
+✅ PASS 	Returns a function with one argument unchanged: (function (a) a) | Actual: (function (a) a) | Expected: (function (a) a)
 
-✅ PASS 	Stores and looks up a function using set: foo | Actual: (function (a b) (add a b)) | Expected: (function (a b) (add a b))
+-----------------------------------------------------------
+------------------ TEST FUNCTION CALLS --------------------
+-----------------------------------------------------------
+📌 Note: User-defined functions should evaluate passed values using a local environment.
+
+✅ PASS 	Calls a user-defined function: (foo 2 3) | Actual: 5 | Expected: 5
+
+✅ PASS 	Evaluates arguments before calling a user-defined function: (foo (add 1 2) (mul 2 3)) | Actual: 9 | Expected: 9
+
+✅ PASS 	Removes the local environment after a function returns | Actual: () | Expected: ()
+
+✅ PASS 	Calls a user-defined function with no arguments: (noArgs) | Actual: 5 | Expected: 5
+
+✅ PASS 	Calls a user-defined function from another function: (bar 3) | Actual: 8 | Expected: 8
+
+✅ PASS 	Removes local environments after nested function calls | Actual: () | Expected: ()
 
 -----------------------------------------------------------
 ------------------------- TEST EVAL -----------------------
@@ -621,9 +636,10 @@
 
 ✅ PASS 	Evaluates the result of another expression: eval((eval (car (a b c)))) | Actual: a | Expected: a
 
+
 ===========================================================
                         TEST REPORT                        
 ===========================================================
-✅ Passed: 188
+✅ Passed: 193
 ❌ Failed: 0
-Total:  188
+Total:  193
