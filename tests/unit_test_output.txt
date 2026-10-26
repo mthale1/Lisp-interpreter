@@ -338,15 +338,21 @@
 -----------------------------------------------------------
 ----------------------- TEST LOOKUP -----------------------
 -----------------------------------------------------------
-📌 Note: Lookup should return the most recent value associated with a symbol or return the symbol itself if it is undefined.
+📌 Note: Lookup should search local variables before global variables and return the symbol itself if it is undefined.
 
-✅ PASS 	Returns the value associated with a symbol: lookup(a) | Actual: 2 | Expected: 2
-
-✅ PASS 	Returns another value stored in the environment: lookup(b) | Actual: 4 | Expected: 4
+✅ PASS 	Returns the value associated with a global symbol: lookup(a) | Actual: 2 | Expected: 2
 
 ✅ PASS 	Returns an undefined symbol unchanged: lookup(x) | Actual: x | Expected: x
 
-✅ PASS 	Returns the most recent value when a symbol is defined again: lookup(a) | Actual: 10 | Expected: 10
+✅ PASS 	Returns the most recent global value: lookup(a) | Actual: 10 | Expected: 10
+
+✅ PASS 	Returns a local value: lookup(b) | Actual: 3 | Expected: 3
+
+✅ PASS 	Returns the local value before the global value: lookup(a) | Actual: 2 | Expected: 2
+
+✅ PASS 	Returns a global value when the symbol is not local: lookup(c) | Actual: 4 | Expected: 4
+
+✅ PASS 	Returns the global value after the local environment is removed: lookup(a) | Actual: 10 | Expected: 10
 
 -----------------------------------------------------------
 ------------------------- TEST SET ------------------------
@@ -576,6 +582,19 @@
 ✅ PASS 	Evaluates both arguments before comparing: (lt (sub 5 3) (add 2 3)) | Actual: T | Expected: T
 
 -----------------------------------------------------------
+---------------------- TEST FUNCTION ----------------------
+-----------------------------------------------------------
+📌 Note: Function expressions should evaluate to themselves and can be stored using set.
+
+✅ PASS 	Returns a function expression unchanged | Actual: (function (a b) (add a b)) | Expected: (function (a b) (add a b))
+
+✅ PASS 	Returns a function with no arguments unchanged | Actual: (function () 5) | Expected: (function () 5)
+
+✅ PASS 	Returns a function with one argument unchanged | Actual: (function (a) a) | Expected: (function (a) a)
+
+✅ PASS 	Stores and looks up a function using set: foo | Actual: (function (a b) (add a b)) | Expected: (function (a b) (add a b))
+
+-----------------------------------------------------------
 ------------------------- TEST EVAL -----------------------
 -----------------------------------------------------------
 📌 Note: Eval should correctly evaluate supported S-expressions and operations.
@@ -605,6 +624,6 @@
 ===========================================================
                         TEST REPORT                        
 ===========================================================
-✅ Passed: 181
+✅ Passed: 188
 ❌ Failed: 0
-Total:  181
+Total:  188

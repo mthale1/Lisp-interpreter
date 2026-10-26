@@ -17,6 +17,7 @@ struct SExpr {
 };
 
 extern SExpr* rho;
+extern SExpr* local;
 
 void skipWhitespace();
 

@@ -124,3 +124,13 @@ q
 (lt 5 2)
 (lt 5 5)
 (lt (sub 5 3) (add 2 3))
+
+(function () 5)
+(function (a) a)
+(function (a b) (add a b))
+
+(set foo (function () 5))
+foo
+
+(set foo (function (a b) (add a b)))
+foo

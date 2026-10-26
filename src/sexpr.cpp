@@ -7,6 +7,7 @@
 using namespace std;
 
 SExpr* rho = makeNil();
+SExpr* local = makeNil();
 
 // Ignore whitespace characters in the input.
 void skipWhitespace(){
@@ -225,8 +226,25 @@ SExpr* makePair(SExpr* name, SExpr* value) {
     return cons(name, cons(value, makeNil()));
 }
 
-// Searches rho for a symbol and returns its assigned value.
+// Searches local variables first, then rho, for a symbol and returns its assigned value.
 SExpr* lookup(SExpr* symbol) {
+    if (!isNil(local)) {
+        SExpr* environment = car(local);
+        SExpr* names = car(environment);
+        SExpr* values = car(cdr(environment));
+
+        while (!isNil(names)){
+            SExpr* name = car(names);
+
+            if (name->atom == symbol->atom){
+                return car(values);
+            }
+
+            names = cdr(names);
+            values = cdr(values);
+        }
+    }
+
     SExpr* current = rho;
 
     while (!isNil(current)){
@@ -242,6 +260,7 @@ SExpr* lookup(SExpr* symbol) {
 
     return symbol;
 }
+
 
 // Evaluates an S-expression by recognizing and executing supported operations, assignments, and predicates.
 SExpr* eval(SExpr* expr){
@@ -458,7 +477,10 @@ SExpr* eval(SExpr* expr){
 
             return makeNil();
         }
-        // QUOTE & EVAL
+        // others
+        else if (symbol == "function"){
+            return expr;
+        }
         else if (symbol == "quote"){
             SExpr* argument = car(cdr(expr));
             return quote(argument);

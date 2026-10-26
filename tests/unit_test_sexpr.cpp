@@ -491,27 +491,29 @@ void testLookup(){
     cout << "\n-----------------------------------------------------------" << endl;
     cout << "----------------------- TEST LOOKUP -----------------------" << endl;
     cout << "-----------------------------------------------------------" << endl;
-    cout << "📌 Note: Lookup should return the most recent value associated with a symbol or return the symbol itself if it is undefined." << endl;
+    cout << "📌 Note: Lookup should search local variables before global variables and return the symbol itself if it is undefined." << endl;
 
     SExpr* a = makeAtom("a");
     SExpr* b = makeAtom("b");
+    SExpr* c = makeAtom("c");
     SExpr* x = makeAtom("x");
     SExpr* two = makeAtom("2");
+    SExpr* three = makeAtom("3");
     SExpr* four = makeAtom("4");
     SExpr* ten = makeAtom("10");
 
     SExpr* result;
 
     rho = makeNil();
+    local = makeNil();
 
+    // Global environment: ((c 4) (b 4) (a 2))
     rho = cons(makePair(a, two), rho);
     rho = cons(makePair(b, four), rho);
+    rho = cons(makePair(c, four), rho);
 
     result = lookup(a);
-    check(result == two, "Returns the value associated with a symbol: lookup(a)", exprToString(result), "2");
-
-    result = lookup(b);
-    check(result == four, "Returns another value stored in the environment: lookup(b)", exprToString(result), "4");
+    check(result == two, "Returns the value associated with a global symbol: lookup(a)", exprToString(result), "2");
 
     result = lookup(x);
     check(result == x, "Returns an undefined symbol unchanged: lookup(x)", exprToString(result), "x");
@@ -519,7 +521,29 @@ void testLookup(){
     rho = cons(makePair(a, ten), rho);
 
     result = lookup(a);
-    check(result == ten, "Returns the most recent value when a symbol is defined again: lookup(a)", exprToString(result), "10");
+    check(result == ten, "Returns the most recent global value: lookup(a)", exprToString(result), "10");
+
+    // Local environment: ((a b) (2 3))
+    SExpr* names = cons(a, cons(b, makeNil()));
+    SExpr* values = cons(two, cons(three, makeNil()));
+    local = cons(cons(names, cons(values, makeNil())), local);
+
+    result = lookup(b);
+    check(result == three, "Returns a local value: lookup(b)", exprToString(result), "3");
+
+    result = lookup(a);
+    check(result == two, "Returns the local value before the global value: lookup(a)", exprToString(result), "2");
+
+    result = lookup(c);
+    check(result == four, "Returns a global value when the symbol is not local: lookup(c)", exprToString(result), "4");
+
+    local = cdr(local);
+
+    result = lookup(a);
+    check(result == ten, "Returns the global value after the local environment is removed: lookup(a)", exprToString(result), "10");
+
+    rho = makeNil();
+    local = makeNil();
 }
 
 void testSet(){
@@ -930,6 +954,34 @@ void testLt(){
     check(exprToString(result) == "T", "Evaluates both arguments before comparing: (lt (sub 5 3) (add 2 3))", exprToString(result), "T");
 }
 
+void testFunction(){
+    cout << "\n-----------------------------------------------------------" << endl;
+    cout << "---------------------- TEST FUNCTION ----------------------" << endl;
+    cout << "-----------------------------------------------------------" << endl;
+    cout << "📌 Note: Function expressions should evaluate to themselves and can be stored using set." << endl;
+
+    rho = makeNil();
+    local = makeNil();
+
+    SExpr* result;
+
+    result = evalString("(function (a b) (add a b))");
+    check(exprToString(result) == "(function (a b) (add a b))", "Returns a function expression unchanged", exprToString(result), "(function (a b) (add a b))");
+
+    result = evalString("(function () 5)");
+    check(exprToString(result) == "(function () 5)", "Returns a function with no arguments unchanged", exprToString(result), "(function () 5)");
+
+    result = evalString("(function (a) a)");
+    check(exprToString(result) == "(function (a) a)", "Returns a function with one argument unchanged", exprToString(result), "(function (a) a)");
+
+    evalString("(set foo (function (a b) (add a b)))");
+    result = evalString("foo");
+    check(exprToString(result) == "(function (a b) (add a b))", "Stores and looks up a function using set: foo", exprToString(result), "(function (a b) (add a b))");
+
+    rho = makeNil();
+    local = makeNil();
+}
+
 void testEval(){
     cout << "\n-----------------------------------------------------------" << endl;
     cout << "------------------------- TEST EVAL -----------------------" << endl;
@@ -1068,6 +1120,8 @@ int main() {
     testDiv();
     testRem();
     testLt();
+
+    testFunction();
 
     testEval();
 

@@ -96,3 +96,10 @@ T
 ()
 ()
 T
+(function () 5)
+(function (a) a)
+(function (a b) (add a b))
+(function () 5)
+(function () 5)
+(function (a b) (add a b))
+(function (a b) (add a b))
