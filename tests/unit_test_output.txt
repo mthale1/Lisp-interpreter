@@ -595,11 +595,13 @@
 -----------------------------------------------------------
 ------------------ TEST FUNCTION CALLS --------------------
 -----------------------------------------------------------
-📌 Note: User-defined functions should evaluate passed values using a local environment.
+📌 Note: User-defined function calls should evaluate their arguments using a local environment and remove the local environment when the function returns.
 
 ✅ PASS 	Calls a user-defined function: (foo 2 3) | Actual: 5 | Expected: 5
 
 ✅ PASS 	Evaluates arguments before calling a user-defined function: (foo (add 1 2) (mul 2 3)) | Actual: 9 | Expected: 9
+
+✅ PASS 	Passes a quoted list as an argument: (identity '(a b c)) | Actual: (a b c) | Expected: (a b c)
 
 ✅ PASS 	Removes the local environment after a function returns | Actual: () | Expected: ()
 
@@ -608,6 +610,21 @@
 ✅ PASS 	Calls a user-defined function from another function: (bar 3) | Actual: 8 | Expected: 8
 
 ✅ PASS 	Removes local environments after nested function calls | Actual: () | Expected: ()
+
+-----------------------------------------------------------
+------------------------ TEST DEF -------------------------
+-----------------------------------------------------------
+📌 Note: def should construct the correct function expression and store it under the given function name.
+
+✅ PASS 	Defines a user-defined function: (def foo (a b) (add a b)) | Actual: (function (a b) (add a b)) | Expected: (function (a b) (add a b))
+
+✅ PASS 	Stores the function under its name: lookup(foo) | Actual: (function (a b) (add a b)) | Expected: (function (a b) (add a b))
+
+✅ PASS 	Defines a function with no arguments: (def five () 5) | Actual: (function () 5) | Expected: (function () 5)
+
+✅ PASS 	Defines a function with a parameter as its body: (def identity (x) x) | Actual: (function (x) x) | Expected: (function (x) x)
+
+✅ PASS 	Defines a function that calls another function: (def bar (x) (foo x 5)) | Actual: (function (x) (foo x 5)) | Expected: (function (x) (foo x 5))
 
 -----------------------------------------------------------
 ------------------------- TEST EVAL -----------------------
@@ -640,6 +657,6 @@
 ===========================================================
                         TEST REPORT                        
 ===========================================================
-✅ Passed: 193
+✅ Passed: 199
 ❌ Failed: 0
-Total:  193
+Total:  199

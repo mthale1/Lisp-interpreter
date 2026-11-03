@@ -150,5 +150,17 @@ bar
 (set foo (function (x) (add x n)))
 (foo 5)
 
-(set result (foo 2 3))
+(set result (foo 5))
 result
+
+(def sum (a b) (add a b))
+sum
+(sum 4 5)
+
+(def five () 5)
+five
+(five)
+
+(def addFive (x) (sum x 5))
+addFive
+(addFive 7)

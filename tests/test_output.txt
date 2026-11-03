@@ -114,5 +114,14 @@ T
 10
 (function (x) (add x n))
 15
-12
+15
+15
+(function (a b) (add a b))
+(function (a b) (add a b))
+9
+(function () 5)
+(function () 5)
+5
+(function (x) (sum x 5))
+(function (x) (sum x 5))
 12

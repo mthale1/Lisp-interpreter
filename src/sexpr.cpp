@@ -295,6 +295,24 @@ SExpr* eval(SExpr* expr){
 
             return evaluated;
         }
+        // DEF
+        else if (symbol == "def") {
+            SExpr* name = car(cdr(expr));
+            SExpr* args = car(cdr(cdr(expr)));
+            SExpr* body = car(cdr(cdr(cdr(expr))));
+
+            // construct (function args body)
+            SExpr* funBody = cons(body, makeNil()); // (body)
+            SExpr* funArgs = cons(args, funBody); // (args body)
+            SExpr* funExpr = cons(makeAtom("function"), funArgs); // (function args body)
+
+            // construct (set name (function args body))
+            SExpr* setFun = cons(funExpr, makeNil());  // ((function args body))
+            SExpr* setName = cons(name, setFun); // (name (function args body))
+            SExpr* setExpr = cons(makeAtom("set"), setName); // (set name (function args body))
+
+            return eval(setExpr);
+        }
         // PREDICATES
         else if (symbol == "nil?" || symbol == "not?"){
             SExpr* arg = car(cdr(expr));

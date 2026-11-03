@@ -1079,8 +1079,7 @@ void testFunctionCalls(){
     cout << "\n-----------------------------------------------------------" << endl;
     cout << "------------------ TEST FUNCTION CALLS --------------------" << endl;
     cout << "-----------------------------------------------------------" << endl;
-    cout << "📌 Note: User-defined functions should evaluate passed values using a local environment." << endl;
-
+    cout << "📌 Note: User-defined function calls should evaluate their arguments using a local environment and remove the local environment when the function returns." << endl;
     rho = makeNil();
     local = makeNil();
 
@@ -1094,6 +1093,14 @@ void testFunctionCalls(){
 
     res = evalString("(foo (add 1 2) (mul 2 3))");
     check(exprToString(res) == "9", "Evaluates arguments before calling a user-defined function: (foo (add 1 2) (mul 2 3))", exprToString(res), "9");
+
+    // identity = (function (x) x)
+    SExpr* identity = makeAtom("identity");
+    SExpr* identityFunction = readString("(function (x) x)");
+    rho = cons(makePair(identity, identityFunction), rho);
+
+    res = evalString("(identity '(a b c))");
+    check(exprToString(res) == "(a b c)", "Passes a quoted list as an argument: (identity '(a b c))", exprToString(res), "(a b c)");
 
     check(isNil(local), "Removes the local environment after a function returns", exprToString(local), "()");
 
@@ -1115,7 +1122,37 @@ void testFunctionCalls(){
 
     check(isNil(local), "Removes local environments after nested function calls", exprToString(local), "()");
 
-    // Reset the environments
+    rho = makeNil();
+    local = makeNil();
+}
+
+void testDef(){
+    currentTestFunction = "TEST DEF";
+
+    cout << "\n-----------------------------------------------------------" << endl;
+    cout << "------------------------ TEST DEF -------------------------" << endl;
+    cout << "-----------------------------------------------------------" << endl;
+    cout << "📌 Note: def should construct the correct function expression and store it under the given function name." << endl;
+    rho = makeNil();
+    local = makeNil();
+
+    SExpr* res;
+
+    res = evalString("(def foo (a b) (add a b))");
+    check(exprToString(res) == "(function (a b) (add a b))", "Defines a user-defined function: (def foo (a b) (add a b))", exprToString(res), "(function (a b) (add a b))");
+
+    res = lookup(makeAtom("foo"));
+    check(exprToString(res) == "(function (a b) (add a b))", "Stores the function under its name: lookup(foo)", exprToString(res), "(function (a b) (add a b))");
+
+    res = evalString("(def five () 5)");
+    check(exprToString(res) == "(function () 5)", "Defines a function with no arguments: (def five () 5)", exprToString(res), "(function () 5)");
+
+    res = evalString("(def identity (x) x)");
+    check(exprToString(res) == "(function (x) x)", "Defines a function with a parameter as its body: (def identity (x) x)", exprToString(res), "(function (x) x)");
+
+    res = evalString("(def bar (x) (foo x 5))");
+    check(exprToString(res) == "(function (x) (foo x 5))", "Defines a function that calls another function: (def bar (x) (foo x 5))", exprToString(res), "(function (x) (foo x 5))");
+
     rho = makeNil();
     local = makeNil();
 }
@@ -1270,6 +1307,7 @@ int main() {
 
     testFunction();
     testFunctionCalls();
+    testDef();
 
     testEval();
 
